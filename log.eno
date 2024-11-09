@@ -1,0 +1,7 @@
+2024-11-09 10:24:54
+init project:
+
+    npm create vite@latest fansjs -- --template react
+    cd fansjs
+    npm install
+    npm run dev
