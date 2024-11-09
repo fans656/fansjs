@@ -21,9 +21,10 @@ export default defineConfig(({mode}) => {
     config = _.merge(config, {
       build: {
         lib: {
-          entry: path.resolve(__dirname, 'src/index.js'),
-          name: 'fansjs',
-          fileName: (format) => `fansjs.${format}.js`
+          entry: {
+            'index': path.resolve(__dirname, 'src/index.js'),
+            'ui': path.resolve(__dirname, 'src/ui/index.js'),
+          },
         },
       },
     });
