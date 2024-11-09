@@ -26,6 +26,12 @@ export default defineConfig(({mode}) => {
             'ui': path.resolve(__dirname, 'src/ui/index.js'),
           },
         },
+        rollupOptions: {
+          external: [
+            'react',
+            'react-dom',
+          ],
+        },
       },
     });
   }

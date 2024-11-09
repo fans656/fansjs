@@ -5,3 +5,9 @@ init project:
     cd fansjs
     npm install
     npm run dev
+
+2024-11-09 11:35:56
+{todo}
+- documentation page
+  - sample usage `import { Form } from 'fansjs/ui';`
+  - list of components
