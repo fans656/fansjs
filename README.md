@@ -14,6 +14,18 @@ Build library:
 
     npm run build
 
+Link library:
+
+    sudo npm link
+
+Link library for use:
+
+    npm link fansjs
+
+Build library in watch mode:
+
+    npm run build -- --watch
+
 Publish library:
 
     # [OPTIONAL] ensure version in package.json is updated if code changes

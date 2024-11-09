@@ -1,7 +1,13 @@
+import React from 'react';
+import { Form as AntdForm, Input } from 'antd';
+
 export function Form() {
   return (
-    <div>
-      fansjs.ui.form
-    </div>
+    <AntdForm
+    >
+      <AntdForm.Item>
+        <Input/>
+      </AntdForm.Item>
+    </AntdForm>
   );
 }
