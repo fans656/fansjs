@@ -8,6 +8,15 @@ init project:
 
 2024-11-09 11:35:56
 {todo}
+- . list test cases
+
+2024-11-10 02:01:02
+{todo}
+- . react router for /testcase
+- . header and links
+- . current link
+- . render test case
+- playwright tests
 - documentation page
   - sample usage `import { Form } from 'fansjs/ui';`
   - list of components

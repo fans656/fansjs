@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from 'path';
+import pathlib from 'path';
 import _ from 'lodash';
 import { glob } from 'glob';
 import fs from 'fs';
@@ -19,7 +19,8 @@ export default defineConfig(({mode}) => {
     },
     resolve: {
       alias: {
-        'src': path.resolve(__dirname, './src'),
+        'fansjs': pathlib.resolve(__dirname, './src'),
+        'src': pathlib.resolve(__dirname, './src'),
       },
     },
     plugins: [
@@ -32,8 +33,8 @@ export default defineConfig(({mode}) => {
       build: {
         lib: {
           entry: {
-            'index': path.resolve(__dirname, 'src/index.js'),
-            'ui': path.resolve(__dirname, 'src/ui/index.js'),
+            'index': pathlib.resolve(__dirname, 'src/index.js'),
+            'ui': pathlib.resolve(__dirname, 'src/ui/index.js'),
           },
         },
         rollupOptions: {
@@ -54,30 +55,60 @@ function collectDocs() {
     name: 'collectDocs',
     async buildStart() {
       const suffix = '.doc.js';
-      const root = path.resolve(__dirname, 'src');
-      const files = await glob(path.resolve(__dirname, 'src/**/*.doc.js'));
+      const root = pathlib.resolve(__dirname, 'src');
+      const files = await glob(pathlib.resolve(__dirname, 'src/**/*.doc.js'));
       const docs = files.map((file, index) => {
-        file = file.substring(root.length + 1);
-        const name = file.replace('/', '.').replace(/\.doc\.js$/, '');
+        const path = file.substring(root.length + 1);
+        const id = path.replace('/', '.').replace(/\.doc\.js$/, '');
         const data = `doc${index}`
-        return {name, data, file: '../' + file};
+        return {id, data, file, path: '../' + path};
       });
 
-      const content = mustache.render(dedent(`
-        import { Doc } from './doc';
+      const testcaseApps = [];
+      for (const doc of docs) {
+        const mod = await import(doc.file);
+        for (const testcase of (mod.doc.testcases || [])) {
+          const testcaseId = `${doc.id}__${testcase.desc.replace(/ /g, '_')}`
+          if (testcase.app) {
+            const relpath = `src/doc/testcases.generated/${testcaseId}.jsx`;
+            const path = pathlib.resolve(__dirname, relpath);
+            fs.writeFileSync(path, dedent(testcase.app));
+            testcaseApps.push({
+              id: testcaseId,
+              path: relpath,
+              mod: `app${testcaseApps.length}`,
+            });
+          }
+        };
+      }
 
+      const content = mustache.render(dedent(`
+        // NOTE: DO NOT MODIFY! (This is auto generated)
         {{#docs}}
-        import { doc as {{data}} } from '{{{file}}}';
+        import { doc as {{data}} } from '{{{path}}}';
         {{/docs}}
 
-        export const docs = {
-          {{#docs}}
-          '{{name}}': new Doc({name: '{{name}}', data: {{data}}}),
-          {{/docs}}
-        };
-      `), {docs});
+        {{#testcaseApps}}
+        import { App as {{mod}} } from '{{{path}}}';
+        {{/testcaseApps}}
+        
+        import { Docs } from './doc';
 
-      fs.writeFileSync(path.resolve(__dirname, 'src/doc/index.js'), content);
+        export const docs = new Docs({
+          docs: [
+            {{#docs}}
+            {id: '{{id}}', ...{{data}}},
+            {{/docs}}
+          ],
+          testcaseApps: {
+            {{#testcaseApps}}
+            '{{id}}': {{mod}},
+            {{/testcaseApps}}
+          },
+        });
+      `), {docs, testcaseApps});
+
+      fs.writeFileSync(pathlib.resolve(__dirname, 'src/doc/index.js'), content);
     },
   };
 }
