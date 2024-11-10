@@ -58,7 +58,7 @@ export function Header({
       <Menu
         theme="dark"
         mode="horizontal"
-        defaultSelectedKeys={selectedKeys}
+        selectedKeys={selectedKeys}
         items={links.map(link => ({
           key: getKey(link),
           label: (

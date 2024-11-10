@@ -16,7 +16,8 @@ init project:
 - . header and links
 - . current link
 - . render test case
-- playwright tests
+- . playwright tests
+- samples doc page
 - documentation page
   - sample usage `import { Form } from 'fansjs/ui';`
   - list of components

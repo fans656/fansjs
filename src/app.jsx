@@ -21,6 +21,7 @@ const pages = [
     path: '/',
     comp: (
       <Page>
+        <Docs/>
       </Page>
     ),
   },
@@ -76,4 +77,17 @@ function Testcase() {
   const {id} = Routed.useParams();
   const testcase = docs.testcases[id];
   return testcase ? <testcase.App/> : null;
+}
+
+function Docs() {
+  return (
+    <Layout>
+      <Left>
+        side panel
+      </Left>
+      <Content>
+        content
+      </Content>
+    </Layout>
+  );
 }

@@ -2,18 +2,9 @@ export const doc = {
   title: 'Layout',
 
   samples: [
-    {
-      name: 'Fields',
-      render: ({jsx}) => jsx`
-        <Form
-          fields={[
-            {name: 'username', type: 'input'},
-          ]}
-        />
-      `,
-    },
   ],
   
-  // TODO: testcases
+  // TODO: change path should update selected link
+  // TODO: more tests
 };
 
