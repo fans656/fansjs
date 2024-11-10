@@ -4,17 +4,22 @@ export const doc = {
   samples: [
     {
       name: 'Fields',
-      render: ({jsx}) => jsx`
-        <Form
-          fields={[
-            {name: 'username', type: 'input'},
-          ]}
-        />
+      app: `
+        import { Form } from 'fansjs/ui';
+        
+        export const App = () => (
+          <Form
+            fields={[
+              {name: 'username', type: 'input'},
+              {name: 'password', type: 'password'},
+              {name: 'login', type: 'submit'},
+            ]}
+          />
+        );
       `,
     },
   ],
 
-  // TODO
   testcases: [
     {
       desc: 'fields are correct html elements',
@@ -25,12 +30,16 @@ export const doc = {
           <Form
             fields={[
               {name: 'username', type: 'input'},
+              {name: 'password', type: 'password'},
+              {name: 'login', type: 'submit'},
             ]}
           />
         );
       `,
-      verify: async ({page, util}) => {
+      verify: async ({util}) => {
         await util.verifyElem('#username', {tag: 'input'});
+        await util.verifyElem('#password', {tag: 'input', attrs: {type: 'password'}});
+        await util.verifyElem('#login', {tag: 'button'});
       },
     },
 
@@ -46,20 +55,20 @@ export const doc = {
               {name: 'password', type: 'input'},
               {name: 'login', type: 'submit'},
             ]}
+            submit={(values) => {
+              console.log(JSON.stringify(values));
+            }}
           />
         );
       `,
       verify: async ({page, util}) => {
-        await util.verifyElem('#username', {tag: 'input'});
-
-        await util.verifyLog(() => {
-          page.fill('#username', 'foo');
-          page.fill('#password', 'bar');
-          page.click('#login');
-        }, (log) => {
+        await page.fill('#username', 'foo');
+        await page.fill('#password', 'bar');
+        await page.click('#login');
+        await util.verifyLog(log => {
           const data = JSON.parse(log);
-          util.assert(data.username, 'foo');
-          util.assert(data.password, 'bar');
+          util.assert(data.username === 'foo');
+          util.assert(data.password === 'bar');
         });
       },
     },

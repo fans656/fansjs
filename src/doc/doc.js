@@ -2,6 +2,7 @@ export class Docs {
   constructor({docs, testcaseApps}) {
     // Usage: `docs.docs`
     this.docs = [];
+    this.testcases = [];
 
     for (const docData of docs) {
       const doc =  new Doc(docData);
@@ -16,8 +17,9 @@ export class Docs {
           testcase.App = App;
         }
 
-        // Usage: `testcase = docs[testcaseId]`
-        this[testcase.id] = testcase;
+        // Usage: `testcase = docs.testcases[testcaseId]`
+        this.testcases.push(testcase);
+        this.testcases[testcase.id] = testcase;
       }
     }
   }

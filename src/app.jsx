@@ -74,6 +74,6 @@ function Testcases() {
 
 function Testcase() {
   const {id} = Routed.useParams();
-  const testcase = docs[id];
+  const testcase = docs.testcases[id];
   return testcase ? <testcase.App/> : null;
 }

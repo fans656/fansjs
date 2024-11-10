@@ -8,6 +8,7 @@ import dedent from 'dedent';
 import mustache from 'mustache';
 
 import packageJson from './package.json';
+import { ports } from './src/ports';
 
 export default defineConfig(({mode}) => {
   let config = {
@@ -27,6 +28,9 @@ export default defineConfig(({mode}) => {
       react(),
       collectDocs(),
     ],
+    server: {
+      port: ports.fansjs_dev,
+    },
   };
   if (mode !== 'app') {
     config = _.merge(config, {
@@ -70,12 +74,12 @@ function collectDocs() {
         for (const testcase of (mod.doc.testcases || [])) {
           const testcaseId = `${doc.id}__${testcase.desc.replace(/ /g, '_')}`
           if (testcase.app) {
-            const relpath = `src/doc/testcases.generated/${testcaseId}.jsx`;
-            const path = pathlib.resolve(__dirname, relpath);
+            const relpath = `doc/testcases.generated/${testcaseId}.jsx`;
+            const path = pathlib.resolve(__dirname, 'src', relpath);
             fs.writeFileSync(path, dedent(testcase.app));
             testcaseApps.push({
               id: testcaseId,
-              path: relpath,
+              path: '../' + relpath,
               mod: `app${testcaseApps.length}`,
             });
           }
