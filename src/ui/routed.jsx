@@ -6,6 +6,7 @@ import {
   Link,
   useParams,
   useLocation,
+  useSearchParams,
 } from 'react-router-dom';
 
 export function Routed({children = []}) {
@@ -35,6 +36,15 @@ export function Routed({children = []}) {
   );
 }
 
+Routed.Link = Link;
+
 Routed.useParams = useParams;
 Routed.useLocation = useLocation;
-Routed.Link = Link;
+Routed.useQuery = () => {
+  const [query, setQuery] = useSearchParams();
+  const ret = {};
+  for (const [key, value] of query.entries()) {
+    ret[key] = value;
+  }
+  return ret;
+};

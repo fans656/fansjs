@@ -1,4 +1,4 @@
-import { Routed, Layout, Header, Left, Content } from 'fansjs/ui';
+import { Routed, Layout, Header, Left, Content, Toc } from 'fansjs/ui';
 
 import { docs } from 'src/doc';
 
@@ -80,10 +80,18 @@ function Testcase() {
 }
 
 function Docs() {
+  const {cur} = Routed.useQuery();
   return (
     <Layout>
       <Left>
-        side panel
+        <Toc
+          data={docs.docs.map(doc => ({
+            key: doc.id,
+            title: doc.title,
+            href: `?cur=${doc.id}`,
+          }))}
+          selected={cur}
+        />
       </Left>
       <Content>
         content
