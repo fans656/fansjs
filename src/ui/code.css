@@ -1,0 +1,9 @@
+.fansui-code {
+  background: #eee;
+  font-size: 12px;
+  padding: 1em;
+}
+
+.fansui-code > code {
+  font-family: Consolas, Courier, monospace;
+}

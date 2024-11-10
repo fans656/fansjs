@@ -18,6 +18,8 @@ init project:
 - . render test case
 - . playwright tests
 - samples doc page
+  - . toc
+  - render samples
 - documentation page
   - sample usage `import { Form } from 'fansjs/ui';`
   - list of components

@@ -1,15 +1,18 @@
+import dedent from 'dedent';
+
 export class Docs {
-  constructor({docs, testcaseApps}) {
+  constructor({docs, testcaseApps, sampleApps}) {
     // Usage: `docs.docs`
     this.docs = [];
     this.testcases = [];
+    this.samples = {};
 
     for (const docData of docs) {
-      const doc =  new Doc(docData);
+      const doc = new Doc(docData);
       this.docs.push(doc);
 
       // Usage: `doc = docs[docId]`
-      this[docData.id] = doc;
+      this[doc.id] = doc;
 
       for (const testcase of Object.values(doc.testcases)) {
         const App = testcaseApps[testcase.id];
@@ -21,6 +24,17 @@ export class Docs {
         this.testcases.push(testcase);
         this.testcases[testcase.id] = testcase;
       }
+
+      for (const sample of doc.samples) {
+        sample.app = dedent(sample.app);
+        const App = sampleApps[sample.id];
+        if (App) {
+          sample.App = App;
+        }
+
+        // Usage: `sample = docs.samples[sampleId]`
+        this.samples[sample.id] = sample;
+      }
     }
   }
 }
@@ -30,6 +44,10 @@ class Doc {
     this.id = data.id;
     this.title = data.title || data.id;
     this.samples = data.samples || [];
+    
+    this.samples.forEach((sample, index) => {
+      sample.id = `${this.id}__sample_${index}`;  // TODO: sync with vite.config.js
+    });
 
     this.testcases = {};
     for (const testcaseData of (data.testcases || [])) {

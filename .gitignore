@@ -25,4 +25,5 @@ dist-ssr
 
 dist.app
 testcases.generated
+samples.generated
 test-results

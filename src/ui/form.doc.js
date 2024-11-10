@@ -3,7 +3,7 @@ export const doc = {
 
   samples: [
     {
-      name: 'Fields',
+      title: 'Fields',
       app: `
         import { Form } from 'fansjs/ui';
         
@@ -14,6 +14,9 @@ export const doc = {
               {name: 'password', type: 'password'},
               {name: 'login', type: 'submit'},
             ]}
+            submit={(values) => {
+              console.log(values);
+            }}
           />
         );
       `,

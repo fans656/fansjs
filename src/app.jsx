@@ -1,4 +1,6 @@
-import { Routed, Layout, Header, Left, Content, Toc } from 'fansjs/ui';
+import {
+  Routed, Layout, Header, Left, Content, Toc, Code,
+} from 'fansjs/ui';
 
 import { docs } from 'src/doc';
 
@@ -94,8 +96,28 @@ function Docs() {
         />
       </Left>
       <Content>
-        content
+        <Doc doc={docs[cur]}/>
       </Content>
     </Layout>
+  );
+}
+
+function Doc({doc}) {
+  return doc ? (
+    <div>
+      {doc.samples.map(sample => (
+        <Sample key={sample.id} sample={sample}/>
+      ))}
+    </div>
+  ) : null;
+}
+
+function Sample({sample}) {
+  return (
+    <div>
+      <h3>{sample.title}</h3>
+      <sample.App/>
+      <Code>{sample.app}</Code>
+    </div>
   );
 }

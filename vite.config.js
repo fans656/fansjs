@@ -69,6 +69,7 @@ function collectDocs() {
       });
 
       const testcaseApps = [];
+      const sampleApps = [];
       for (const doc of docs) {
         const mod = await import(doc.file);
         for (const testcase of (mod.doc.testcases || [])) {
@@ -84,6 +85,19 @@ function collectDocs() {
             });
           }
         };
+        (mod.doc.samples || []).forEach((sample, index) => {
+          const sampleId = `${doc.id}__sample_${index}`
+          if (sample.app) {
+            const relpath = `doc/samples.generated/${sampleId}.jsx`;
+            const path = pathlib.resolve(__dirname, 'src', relpath);
+            fs.writeFileSync(path, dedent(sample.app));
+            sampleApps.push({
+              id: sampleId,
+              path: '../' + relpath,
+              mod: `sampleApp${sampleApps.length}`,
+            });
+          }
+        });
       }
 
       const content = mustache.render(dedent(`
@@ -95,6 +109,10 @@ function collectDocs() {
         {{#testcaseApps}}
         import { App as {{mod}} } from '{{{path}}}';
         {{/testcaseApps}}
+
+        {{#sampleApps}}
+        import { App as {{mod}} } from '{{{path}}}';
+        {{/sampleApps}}
         
         import { Docs } from './doc';
 
@@ -109,8 +127,13 @@ function collectDocs() {
             '{{id}}': {{mod}},
             {{/testcaseApps}}
           },
+          sampleApps: {
+            {{#sampleApps}}
+            '{{id}}': {{mod}},
+            {{/sampleApps}}
+          },
         });
-      `), {docs, testcaseApps});
+      `), {docs, testcaseApps, sampleApps});
 
       fs.writeFileSync(pathlib.resolve(__dirname, 'src/doc/index.js'), content);
     },
