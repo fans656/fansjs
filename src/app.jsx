@@ -1,5 +1,5 @@
 import {
-  Routed, Layout, Header, Left, Content, Toc, Code,
+  Routed, Layout, Toc, Code,
 } from 'fansjs/ui';
 
 import { docs } from 'src/doc';
@@ -40,7 +40,7 @@ export default function App() {
 function Page({children}) {
   return (
     <Layout>
-      <Header
+      <Layout.Header
         links={[
           {title: 'Doc', key: '/'},
           {title: 'Testcase', key: '/testcase'},
@@ -85,7 +85,7 @@ function Docs() {
   const {cur} = Routed.useQuery();
   return (
     <Layout>
-      <Left>
+      <Layout.Left>
         <Toc
           data={docs.docs.map(doc => ({
             key: doc.id,
@@ -94,10 +94,10 @@ function Docs() {
           }))}
           selected={cur}
         />
-      </Left>
-      <Content>
+      </Layout.Left>
+      <Layout.Content style={{padding: '0 1em'}}>
         <Doc doc={docs[cur]}/>
-      </Content>
+      </Layout.Content>
     </Layout>
   );
 }
@@ -116,7 +116,15 @@ function Sample({sample}) {
   return (
     <div>
       <h3>{sample.title}</h3>
-      <sample.App/>
+      {sample.norender ? null : (
+        <div
+          style={{
+            border: '1px solid #6495ED',
+          }}
+        >
+          <sample.App/>
+        </div>
+      )}
       <Code>{sample.app}</Code>
     </div>
   );

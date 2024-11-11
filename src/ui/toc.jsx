@@ -1,6 +1,6 @@
-import { Routed } from 'fansjs/ui';
+import styleInject from 'style-inject';
 
-import './toc.css';
+import { Routed } from 'fansjs/ui';
 
 export function Toc({
   data = [],
@@ -64,3 +64,24 @@ function TocItem({item, selected}) {
     </li>
   );
 }
+
+styleInject(`
+  .fansui-toc ul {
+    list-style: none;
+    padding: 0 1.4em;
+  }
+
+  .fansui-toc li {
+    margin-top: .4em;
+    font-size: .9em;
+  }
+
+  .fansui-toc > ul {
+    padding: 0 .8em;
+  }
+
+  .fansui-toc .fansui-toc-link, .fansui-heading-link {
+    color: inherit;
+    text-decoration: inherit;
+  }
+`);

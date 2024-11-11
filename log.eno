@@ -17,9 +17,11 @@ init project:
 - . current link
 - . render test case
 - . playwright tests
-- samples doc page
+- . samples doc page
   - . toc
-  - render samples
-- documentation page
-  - sample usage `import { Form } from 'fansjs/ui';`
-  - list of components
+  - . render samples
+
+2024-11-12 00:11:06
+{todo}
+- . more samples
+- adjust form label col width based on max label length

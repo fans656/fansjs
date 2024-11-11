@@ -8,6 +8,7 @@ export function Form({
   fields = [],
   submit = () => {},
   prefix = '',
+  style = {},
 }) {
   const conf = confs[size] || (() => {
     console.warn(`invalid size: ${size}`);
@@ -20,6 +21,7 @@ export function Form({
       labelCol={{span: conf.labelSpan}}
       wrapperCol={{span: conf.wrapperSpan}}
       onFinish={submit}
+      style={style}
     >
       {fields.map((field, index) => (
         <Field
@@ -108,8 +110,8 @@ const confs = {
   //   wrapperSpan: 4,
   // },
   'default': {
-    labelSpan: 4,
-    wrapperSpan: 6,
+    labelSpan: 8,
+    wrapperSpan: 16,
   },
   // 'large': {
   //   labelSpan: 6,

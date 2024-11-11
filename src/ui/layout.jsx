@@ -2,19 +2,21 @@ import { useMemo } from 'react';
 import { Layout as AntdLayout, ConfigProvider, Menu, theme } from 'antd';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
-
-import './layout.css';
+import clsx from 'clsx';
+import styleInject from 'style-inject';
 
 import { Routed } from './routed';
 
 export function Layout({
   style = {},
+  id,
+  className,
   children,
 }) {
+  const headerBg = style.background || '#222';
+  const headerColor = style.color || '#ccc';
+  const headerHeight = style.height || 34;
   style.background = style.background || 'inherit';
-  const headerBg = '#222';
-  const headerColor = '#ccc';
-  const headerHeight = 34;
   return (
     <ConfigProvider
       theme={{
@@ -36,17 +38,21 @@ export function Layout({
         }
       }}
     >
-      <AntdLayout>
+      <AntdLayout
+        id={id}
+        className={className}
+        style={style}
+      >
         {children}
       </AntdLayout>
     </ConfigProvider>
   );
 }
 
-export function Header({
+Layout.Header = ({
   links = [],
   children,
-}) {
+}) => {
   const location = Routed.useLocation();
   const selectedKeys = useMemo(() => {
     // use first match
@@ -87,38 +93,42 @@ export function Header({
   );
 }
 
-export function Left({
+Layout.Left = ({
+  style = {},
   children,
-}) {
+}) => {
   return (
-    <Sider
+    <Layout.Sider
       style={{
         borderRight: '1px solid #eee',
+        ...style,
       }}
     >
       {children}
-    </Sider>
+    </Layout.Sider>
   );
 }
 
-export function Right({
+Layout.Right = ({
+  style = {},
   children,
-}) {
+}) => {
   return (
-    <Sider
+    <Layout.Sider
       style={{
         borderLeft: '1px solid #eee',
+        ...style,
       }}
     >
       {children}
-    </Sider>
+    </Layout.Sider>
   );
 }
 
-export function Sider({
+Layout.Sider = ({
   style,
   children,
-}) {
+}) => {
   return (
     <AntdLayout.Sider
       style={{
@@ -131,15 +141,20 @@ export function Sider({
   );
 }
 
-export function Content({
+Layout.Content = ({
+  center,
   style = {},
+  className,
   children,
-}) {
+}) => {
   return (
     <AntdLayout.Content
-      style={{
-        padding: style.padding == null ? '0 1em' : style.padding,
-      }}
+      className={clsx(
+        className,
+        'fansui-layout-content',
+        center && 'center',
+      )}
+      style={style}
     >
       {children}
     </AntdLayout.Content>
@@ -149,3 +164,49 @@ export function Content({
 const getKey = d => d.key || d.href || d.name || d.label || d.title;
 const getHref = d => d.href || d.key;
 const getTitle = d => d.title || d.label || d.name || d.key;
+
+styleInject(`
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    min-height: 100%;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  html, body, #root {
+    display: flex;
+    flex-direction: column;
+  }
+
+  body, #root {
+    flex: 1;
+  }
+
+  .horz {
+    display: flex;
+  }
+
+  .flex-1 {
+    flex: 1;
+  }
+
+  .bordered {
+    border: 0.5px solid #ccc;
+  }
+
+  .padding {
+    padding: .5rem 1rem;
+  }
+  
+  .fansui-layout-content.center {
+    display: flex;
+    justify-content: space-around;
+  }
+`);
+

@@ -1,27 +1,40 @@
 export const doc = {
   title: 'Form',
 
-  samples: [
-    {
-      title: 'Fields',
-      app: `
-        import { Form } from 'fansjs/ui';
-        
-        export const App = () => (
-          <Form
-            fields={[
-              {name: 'username', type: 'input'},
-              {name: 'password', type: 'password'},
-              {name: 'login', type: 'submit'},
-            ]}
-            submit={(values) => {
-              console.log(values);
-            }}
-          />
-        );
-      `,
-    },
-  ],
+  samples: [{
+    title: 'Fields',
+    app: `
+      import { Form } from 'fansjs/ui';
+
+      export const App = () => (
+        <Form
+          fields={[
+            {name: 'username', type: 'input'},
+            {name: 'password', type: 'password'},
+            {name: 'login', type: 'submit'},
+          ]}
+          submit={(values) => {
+            console.log(values);
+          }}
+        />
+      );
+    `,
+  }, {
+    title: 'Label',
+    app: `
+      import { Form } from 'fansjs/ui';
+
+      export const App = () => (
+        <Form
+          fields={[
+            {name: 'username', label: 'Username', type: 'input'},
+            {name: 'password', label: 'Password', type: 'password'},
+          ]}
+          prefix="label"
+        />
+      );
+    `,
+  }],
 
   testcases: [
     {
@@ -73,6 +86,24 @@ export const doc = {
           util.assert(data.username === 'foo');
           util.assert(data.password === 'bar');
         });
+      },
+    },
+
+    {
+      desc: 'can set field label',
+      app: `
+        import { Form } from 'fansjs/ui';
+        
+        export const App = () => (
+          <Form
+            fields={[
+              {name: 'username', label: 'Username', type: 'input'},
+            ]}
+          />
+        );
+      `,
+      verify: async ({page, util}) => {
+        await util.verifyElem('label', {attrs: {title: 'Username'}});
       },
     },
   ],
