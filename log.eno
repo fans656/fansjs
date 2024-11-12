@@ -24,4 +24,10 @@ init project:
 2024-11-12 00:11:06
 {todo}
 - . more samples
+
+2024-11-12 22:17:05
+{todo}
 - adjust form label col width based on max label length
+- right toc
+- form impl: normalize name to `key + label`
+- form impl: normalize type "submit" to `button + attrs`

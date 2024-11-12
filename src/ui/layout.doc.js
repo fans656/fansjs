@@ -35,12 +35,12 @@ export const doc = {
       import { Layout } from 'fansjs/ui';
 
       export const App = () => (
-          <Layout.Header
-            links={[
-              {name: 'foo', href: '/foo'},
-              {name: 'bar', href: '/bar'},
-            ]}
-          />
+        <Layout.Header
+          links={[
+            {label: 'Foo', path: '/foo'},
+            {label: 'Bar', path: '/bar'},
+          ]}
+        />
       );
     `,
   }],

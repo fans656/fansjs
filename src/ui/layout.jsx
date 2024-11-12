@@ -5,7 +5,7 @@ import _ from 'lodash';
 import clsx from 'clsx';
 import styleInject from 'style-inject';
 
-import { Routed } from './routed';
+import { Header } from './header';
 
 export function Layout({
   style = {},
@@ -49,49 +49,7 @@ export function Layout({
   );
 }
 
-Layout.Header = ({
-  links = [],
-  children,
-}) => {
-  const location = Routed.useLocation();
-  const selectedKeys = useMemo(() => {
-    // use first match
-    const link = links.filter(d => getHref(d).startsWith(location.pathname))[0];
-    return link ? [getHref(link)] : [];
-  }, [links, location.pathname]);
-  if (links && !children) {
-    children = (
-      <Menu
-        theme="dark"
-        mode="horizontal"
-        selectedKeys={selectedKeys}
-        items={links.map(link => ({
-          key: getKey(link),
-          label: (
-            <Link to={getHref(link)}>
-              {getTitle(link)}
-            </Link>
-          ),
-          onClick: () => {
-            if (link.href) {
-              window.location.href = link.href;
-            }
-          },
-        }))}
-        style={{ flex: 1, minWidth: 0 }}
-      />
-    );
-  }
-  return (
-    <AntdLayout.Header
-      style={{
-        // borderBottom: '1px solid #eee',
-      }}
-    >
-      {children}
-    </AntdLayout.Header>
-  );
-}
+Layout.Header = Header;
 
 Layout.Left = ({
   style = {},
@@ -160,10 +118,6 @@ Layout.Content = ({
     </AntdLayout.Content>
   );
 }
-
-const getKey = d => d.key || d.href || d.name || d.label || d.title;
-const getHref = d => d.href || d.key;
-const getTitle = d => d.title || d.label || d.name || d.key;
 
 styleInject(`
   * {
