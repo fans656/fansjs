@@ -14,7 +14,7 @@
     "build": "vite build",
     "build:app": "vite build --mode app",
     "unit": "vitest",
-    "test": "playwright test --config=playwright.config.js",
+    "test": "npm run build && playwright test --config=playwright.config.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },

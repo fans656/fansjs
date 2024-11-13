@@ -26,8 +26,13 @@ init project:
 - . more samples
 
 2024-11-12 22:17:05
+
+2024-11-13 23:55:15
 {todo}
-- adjust form label col width based on max label length
+- . more tests (layout)
+- x adjust form label col width based on max label length
 - right toc
 - form impl: normalize name to `key + label`
 - form impl: normalize type "submit" to `button + attrs`
+- sticky header
+- fixed sider

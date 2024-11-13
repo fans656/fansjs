@@ -42,8 +42,8 @@ function Page({children}) {
     <Layout>
       <Layout.Header
         links={[
-          {title: 'Doc', key: '/'},
-          {title: 'Testcase', key: '/testcase'},
+          {label: 'Doc', path: '/'},
+          {label: 'Testcase', path: '/testcase'},
         ]}
       />
       {children}

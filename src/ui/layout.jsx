@@ -54,6 +54,7 @@ Layout.Header = Header;
 Layout.Left = ({
   style = {},
   children,
+  ...attrs
 }) => {
   return (
     <Layout.Sider
@@ -61,6 +62,7 @@ Layout.Left = ({
         borderRight: '1px solid #eee',
         ...style,
       }}
+      {...attrs}
     >
       {children}
     </Layout.Sider>
@@ -70,6 +72,7 @@ Layout.Left = ({
 Layout.Right = ({
   style = {},
   children,
+  ...attrs
 }) => {
   return (
     <Layout.Sider
@@ -77,6 +80,7 @@ Layout.Right = ({
         borderLeft: '1px solid #eee',
         ...style,
       }}
+      {...attrs}
     >
       {children}
     </Layout.Sider>
@@ -86,6 +90,7 @@ Layout.Right = ({
 Layout.Sider = ({
   style,
   children,
+  ...attrs
 }) => {
   return (
     <AntdLayout.Sider
@@ -93,6 +98,7 @@ Layout.Sider = ({
         background: 'inherit',
         ...style
       }}
+      {...attrs}
     >
       {children}
     </AntdLayout.Sider>
@@ -101,9 +107,9 @@ Layout.Sider = ({
 
 Layout.Content = ({
   center,
-  style = {},
   className,
   children,
+  ...attrs
 }) => {
   return (
     <AntdLayout.Content
@@ -112,7 +118,7 @@ Layout.Content = ({
         'fansui-layout-content',
         center && 'center',
       )}
-      style={style}
+      {...attrs}
     >
       {children}
     </AntdLayout.Content>
