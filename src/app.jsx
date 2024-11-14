@@ -83,6 +83,7 @@ function Testcase() {
 
 function Docs() {
   const {cur} = Routed.useQuery();
+  const curDoc = docs[cur];
   return (
     <Layout>
       <Layout.Left>
@@ -98,6 +99,16 @@ function Docs() {
       <Layout.Content style={{padding: '0 1em'}}>
         <Doc doc={docs[cur]}/>
       </Layout.Content>
+      {curDoc ? (
+        <Layout.Right>
+          <Toc
+            data={curDoc.samples.map(sample => ({
+              key: sample.id,
+              title: sample.title,
+            }))}
+          />
+        </Layout.Right>
+      ) : null}
     </Layout>
   );
 }

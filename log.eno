@@ -31,7 +31,7 @@ init project:
 {todo}
 - . more tests (layout)
 - x adjust form label col width based on max label length
-- right toc
+- . right toc
 - form impl: normalize name to `key + label`
 - form impl: normalize type "submit" to `button + attrs`
 - sticky header
