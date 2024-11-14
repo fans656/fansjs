@@ -7,6 +7,7 @@ import { normalizedLink } from './utils';
 
 export function Header({
   links = [],
+  style = {},
   children,
 }) {
   links = links.map(normalizedLink);
@@ -39,7 +40,16 @@ export function Header({
     );
   }
   return (
-    <AntdLayout.Header>
+    <AntdLayout.Header
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: style.zIndex == null ? 1 : style.zIndex,
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
       {children}
     </AntdLayout.Header>
   );

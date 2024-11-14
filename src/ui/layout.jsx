@@ -7,6 +7,8 @@ import styleInject from 'style-inject';
 
 import { Header } from './header';
 
+const headerHeight = 34;
+
 export function Layout({
   style = {},
   id,
@@ -15,7 +17,6 @@ export function Layout({
 }) {
   const headerBg = style.background || '#222';
   const headerColor = style.color || '#ccc';
-  const headerHeight = style.height || 34;
   style.background = style.background || 'inherit';
   return (
     <ConfigProvider
@@ -60,6 +61,11 @@ Layout.Left = ({
     <Layout.Sider
       style={{
         borderRight: '1px solid #eee',
+        position: 'sticky',
+        top: headerHeight,
+        left: 0,
+        height: '100vh',
+        overflow: 'auto',
         ...style,
       }}
       {...attrs}
@@ -78,6 +84,11 @@ Layout.Right = ({
     <Layout.Sider
       style={{
         borderLeft: '1px solid #eee',
+        position: 'sticky',
+        top: headerHeight,
+        right: 0,
+        height: '100vh',
+        overflow: 'auto',
         ...style,
       }}
       {...attrs}

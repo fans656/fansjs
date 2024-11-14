@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 
 dist.app
-testcases.generated
-samples.generated
 test-results
+samples.generated
+testcases.generated
+src/doc/index.js

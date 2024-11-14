@@ -140,6 +140,48 @@ export const doc = {
         await util.verifyElem('#left', {styles: d => d.borderRightWidth != '0px'});
       },
     },
+    {
+      desc: 'Header and sider is fixed by default',
+      app: `
+        import { Layout } from 'fansjs/ui';
+        
+        export const App = () => (
+          <Layout>
+            <Layout.Header>
+              <div id="header-content">
+                header content
+              </div>
+            </Layout.Header>
+            <Layout>
+              <Layout.Left>
+                <div id="sider-content">
+                  sider content
+                </div>
+              </Layout.Left>
+              <Layout.Content style={{height: 3000}}>
+                content
+              </Layout.Content>
+            </Layout>
+          </Layout>
+        );
+      `,
+      verify: async ({page, util}) => {
+        const header = await page.locator('#header-content');
+        const sider = await page.locator('#sider-content');
+        const headerY = (await header.boundingBox()).y;
+        const siderY = (await sider.boundingBox()).y;
+
+        // sider is pushed down a little by header
+        await util.assert(siderY > 0);
+        
+        await page.evaluate(() => {
+          window.scrollBy(0, 1000);
+        });
+
+        await util.assert((await header.boundingBox()).y === headerY);
+        await util.assert((await sider.boundingBox()).y === siderY);
+      },
+    },
     // TODO: change path should update selected link
   ],
 };
