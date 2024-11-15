@@ -91,7 +91,7 @@ function Docs() {
         <Toc
           data={docs.docs.map(doc => ({
             key: doc.id,
-            title: doc.title,
+            label: doc.title,
             href: `?cur=${doc.id}`,
           }))}
           selected={cur}
@@ -105,7 +105,7 @@ function Docs() {
           <Toc
             data={curDoc.samples.map(sample => ({
               key: sample.id,
-              title: sample.title,
+              label: sample.title,
             }))}
           />
         </Layout.Right>

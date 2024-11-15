@@ -17,7 +17,11 @@ export function Toc({
           <a href="#" className="heading-link"
             onClick={(ev) => {
               setTimeout(() => {
-                history.pushState("", document.title, window.location.pathname + window.location.search);
+                history.pushState(
+                  "",
+                  document.title,
+                  window.location.pathname + window.location.search,
+                );
               });
             }}
           ><h3>Contents</h3></a>
@@ -37,6 +41,7 @@ export function Toc({
 }
 
 function TocItem({item, selected}) {
+  item = normalizedItem(item);
   const href = item.href || `#${item.fragment || item.name || item.title}`;
   const highlighted = selected === item.key;
   return (
@@ -48,7 +53,7 @@ function TocItem({item, selected}) {
           fontWeight: highlighted ? 'bold' : null,
         }}
       >
-        {item.title || item.name}
+        {item.label}
       </Routed.Link>
       {item.children ? (
         <ul>
@@ -63,6 +68,12 @@ function TocItem({item, selected}) {
       ) : null}
     </li>
   );
+}
+
+function normalizedItem(item) {
+  item = {...item};
+  item.label = item.label || item.name || item.key;
+  return item;
 }
 
 styleInject(`
@@ -85,3 +96,6 @@ styleInject(`
     text-decoration: inherit;
   }
 `);
+
+// for unit test
+export { normalizedItem };
