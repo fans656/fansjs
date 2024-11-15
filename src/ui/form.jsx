@@ -3,18 +3,22 @@ import { Form as AntdForm, Input } from 'antd';
 
 import { Button } from 'fansjs/ui';
 
+import { normalizedFormField } from './utils';
+
 export function Form({
-  size = 'default',
   fields = [],
   submit = () => {},
   prefix = '',
   style = {},
+  ...attrs
 }) {
-  const conf = confs[size] || (() => {
-    console.warn(`invalid size: ${size}`);
-    return confs['default'];
-  })();
+  const conf = {
+    labelSpan: 8,
+    wrapperSpan: 16,
+  };
   const [form] = AntdForm.useForm();
+  
+  fields = fields.map(normalizedFormField);
 
   return (
     <AntdForm
@@ -23,10 +27,11 @@ export function Form({
       wrapperCol={{span: conf.wrapperSpan}}
       onFinish={submit}
       style={style}
+      {...attrs}
     >
       {fields.map((field, index) => (
         <Field
-          key={field.name || index}
+          key={field.key || index}
           field={field}
           conf={conf}
           form={form}
@@ -38,8 +43,6 @@ export function Form({
 }
 
 function Field({field, conf, form, prefix}) {
-  field = normalizeField(field);
-
   let comp = null;
   switch (field.type) {
     case 'input':
@@ -69,53 +72,11 @@ function Field({field, conf, form, prefix}) {
   }
   return (
     <AntdForm.Item
-      name={prefix + field.name}
-      label={field.nolabel ? null : field.label || field.name}
+      name={prefix + field.key}
+      label={field.nolabel ? null : field.label}
       wrapperCol={wrapperCol}
     >
       {comp}
     </AntdForm.Item>
   );
 }
-
-function normalizeField(field) {
-  switch (field.type) {
-    case 'password':
-      field.type = 'input';
-      field.password = true;
-      break;
-    case 'submit':
-      field.type = 'button';
-      field.submit = true;
-      field.primary = true;
-      field.nolabel = true;
-      break;
-    default:
-      break;
-  }
-
-  switch (field.type) {
-    case 'button':
-      field.nolabel = true;
-      break;
-    default:
-      break;
-  }
-
-  return field;
-}
-
-const confs = {
-  // 'small': {
-  //   labelSpan: 2,
-  //   wrapperSpan: 4,
-  // },
-  'default': {
-    labelSpan: 8,
-    wrapperSpan: 16,
-  },
-  // 'large': {
-  //   labelSpan: 6,
-  //   wrapperSpan: 8,
-  // },
-};
