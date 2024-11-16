@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { Layout as AntdLayout, Menu } from 'antd';
-import { Link } from 'react-router-dom';
 
 import { Routed } from './routed';
 import { normalizedLink } from './utils';
@@ -25,15 +24,10 @@ export function Header({
         items={links.map(link => ({
           key: link.key,
           label: (
-            <Link to={link.path}>
+            <Routed.Link to={link.path}>
               {link.label}
-            </Link>
+            </Routed.Link>
           ),
-          onClick: () => {
-            if (link.path) {
-              window.location.href = link.path;
-            }
-          },
         }))}
         style={{ flex: 1, minWidth: 0 }}
       />
