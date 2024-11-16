@@ -22,6 +22,10 @@ export class API {
     this.host = host;
   }
   
+  async get(path: string, args: object, conf: Conf = {}) {
+    return this.request('GET', path, {...conf, args});
+  }
+  
   async post(path: string, data: object, conf: Conf = {}) {
     return this.request('POST', path, {...conf, data});
   }
