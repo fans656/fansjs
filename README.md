@@ -35,3 +35,11 @@ Publish library:
 Build app:
 
     npm run build:app
+
+Unit test:
+
+    npm run unit
+
+Unit test (specific test):
+
+    npm run unit -- --testNamePattern 'return json'
