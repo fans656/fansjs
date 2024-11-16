@@ -4,3 +4,4 @@ export { Form } from './form';
 export { Button } from './button';
 export { Toc } from './toc';
 export { Code } from './code';
+export { message } from './message';
