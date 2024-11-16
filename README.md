@@ -29,6 +29,7 @@ Build library in watch mode:
 Publish library:
 
     # [OPTIONAL] ensure version in package.json is updated if code changes
+    npm run build
     npm publish
 
 Build app:
