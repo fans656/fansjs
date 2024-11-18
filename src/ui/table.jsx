@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { Table as AntdTable } from 'antd';
 
+import { Actions } from 'fansjs/ui';
+
 import { TableContext } from './contexts';
 
 export function Table({
@@ -13,6 +15,7 @@ export function Table({
       return {
         key: index,
         ...datum,
+        __data: datum,
       };
     });
     let columns;
@@ -48,6 +51,16 @@ function toAntdColumn(col, index) {
     title: col.label || col.name || index,
     dataIndex: col.name,
     key: col.name || col.label,
-    render: col.render ? ((_, item) => col.render(item)) : null,
+    render: toAntdRender(col),
   };
+}
+
+function toAntdRender(col) {
+  if (col.render) {
+    return (_, item) => col.render(item);
+  } else if (col.actions) {
+    return (_, item) => <Actions actions={col.actions} data={item.__data}/>;
+  } else {
+    return null;
+  }
 }

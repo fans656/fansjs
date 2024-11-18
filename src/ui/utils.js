@@ -1,3 +1,11 @@
+export function getKey(d) {
+  return d.key || d.name || d.label;
+}
+
+export function getLabel(d) {
+  return d.label || d.name || d.key;
+}
+
 export function normalizedLink(d) {
   return {
     key: d.key || d.path || d.href || d.name || d.label || d.title || '',
@@ -36,4 +44,8 @@ export function normalizedFormField(field) {
   field.label = field.label || field.name || field.key;
 
   return field;
+}
+
+export function Noop({children}) {
+  return children;
 }

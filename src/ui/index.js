@@ -5,6 +5,8 @@ export { Button } from './button';
 export { Toc } from './toc';
 export { Code } from './code';
 export { Table } from './table';
+export { Edit } from './edit';
+export { Actions, Action } from './action';
 export { message } from './message';
 
 import styleInject from 'style-inject';
@@ -60,5 +62,9 @@ styleInject(`
 
 .vert.xxl-margin > *:not(:last-child) {
   margin-bottom: 5em;
+}
+
+.horz.right {
+  justify-content: flex-end;
 }
 `);
