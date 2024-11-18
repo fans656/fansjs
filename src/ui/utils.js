@@ -1,9 +1,11 @@
+import _ from 'lodash';
+
 export function getKey(d) {
   return d.key || d.name || d.label;
 }
 
 export function getLabel(d) {
-  return d.label || d.name || d.key;
+  return d.label || _.capitalize(d.name) || d.key;
 }
 
 export function normalizedLink(d) {

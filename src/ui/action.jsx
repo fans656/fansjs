@@ -6,16 +6,13 @@ import { Edit, Button } from 'fansjs/ui';
 
 import { getKey, getLabel, Noop } from './utils';
 
-export function Actions({actions, data}) {
-  return (
-    <div className="horz xs-margin">
-      {actions.map(action => (
-        <Action key={getKey(action)} action={action} data={data}/>
-      ))}
-    </div>
-  );
-}
+/*
+action - object {
+  type - string: 'button' | 'more' | 'confirm' | 'edit'
 
+data - object 
+}
+*/
 export function Action({action, data}) {
   if (_.isFunction(data)) {
     data = data();
@@ -32,11 +29,25 @@ export function Action({action, data}) {
   );
 }
 
+export function Actions({actions, data}) {
+  return (
+    <div className="horz xs-margin">
+      {actions.map(action => (
+        <Action key={getKey(action)} action={action} data={data}/>
+      ))}
+    </div>
+  );
+}
+
 function normalizedAction(action) {
   action = {...action};
 
   if (!action.type) {
-    action.type = 'button';
+    if (action.actions) {
+      action.type = 'more';
+    } else {
+      action.type = 'button';
+    }
   }
 
   return action;

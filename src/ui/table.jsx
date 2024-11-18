@@ -4,6 +4,7 @@ import { Table as AntdTable } from 'antd';
 import { Actions } from 'fansjs/ui';
 
 import { TableContext } from './contexts';
+import { getKey, getLabel } from './utils';
 
 export function Table({
   data = [],
@@ -48,9 +49,9 @@ export function Table({
 
 function toAntdColumn(col, index) {
   return {
-    title: col.label || col.name || index,
+    title: getLabel(col) || index,
     dataIndex: col.name,
-    key: col.name || col.label,
+    key: getKey(col),
     render: toAntdRender(col),
   };
 }
