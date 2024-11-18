@@ -158,22 +158,6 @@ styleInject(`
   body, #root {
     flex: 1;
   }
-
-  .horz {
-    display: flex;
-  }
-
-  .flex-1 {
-    flex: 1;
-  }
-
-  .bordered {
-    border: 0.5px solid #ccc;
-  }
-
-  .padding {
-    padding: .5rem 1rem;
-  }
   
   .fansui-layout-content.center {
     display: flex;
