@@ -42,6 +42,8 @@ export const doc = {
   }],
 
   testcases: [
-    // TODO
+    // TODO: can simply render data
+    // TODO: can specify cols
+    // TODO: ...
   ],
 };
