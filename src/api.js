@@ -3,44 +3,48 @@ import _ from 'lodash';
 
 const MODULE = 'fansjs.api';
 
-interface Conf {
-  args: object;
-  data: object;
-  res: ResType;
-}
-
-enum ResType {
-  raw = 'raw';
-}
-
 export class API {
   constructor(
     // e.g. https://auth.fans656.me
     // default will request to same domain
-    host: string = '',  // 
+    host = '',  // 
   ) {
     this.host = host;
   }
   
-  async get(path: string, args: object, conf: Conf = {}) {
+  async get(path, args, conf) {
     return this.request('GET', path, {...conf, args});
   }
   
-  async post(path: string, data: object, conf: Conf = {}) {
+  async post(path, data, conf) {
     return this.request('POST', path, {...conf, data});
   }
   
   async request(
-    method: string,  // e.g. 'GET' / 'POST'
-    path: string,  // e.g. '/api/login'
-    conf: Conf = {},
+    // string - 'GET' | 'POST'
+    method,
+    // string - e.g. '/api/lgoin'
+    path,
+    // dict - conf
+    {
+      // object - request query parameters
+      args,
+      
+      // object - request body
+      data,
+
+      // string - expected result type
+      // 'json' to get `(await fetch()).json()` result
+      // 'raw' to get raw `fetch()` result
+      res = 'json',
+    },
   ) {
-    const url = makeURL(this.host, path, conf.args);
-    const options = makeOptions(method, conf);
+    const url = makeURL(this.host, path, args);
+    const options = makeOptions(method, {data});
     console.debug(`${MODULE} fetch`, url, options);
     try {
       const res = await fetch(url, options);
-      if (conf.res === ResType.raw) {
+      if (res === 'raw') {
         return res;
       }
       if (res.status === 200) {
@@ -75,7 +79,7 @@ export function makeURL(host, path, args) {
   return url;
 }
 
-export function makeOptions(method: string, conf: Conf) {
+export function makeOptions(method, conf) {
   const options = {
     method,
     headers: new Headers(),
