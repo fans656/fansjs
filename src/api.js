@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import qs from 'qs';
 import _ from 'lodash';
 
@@ -14,6 +15,16 @@ export class API {
   
   async get(path, args, conf) {
     return this.request('GET', path, {...conf, args});
+  }
+  
+  useGet(path, args, {deps, ...conf} = {}) {
+    const [result, set_result] = useState();
+    useEffect(() => {
+      (async () => {
+        set_result(await this.get(path, args, conf));
+      })();
+    }, [...(deps || [])]);
+    return result;
   }
   
   async post(path, data, conf) {
