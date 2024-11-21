@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import qs from 'qs';
 import _ from 'lodash';
+
+import { message } from 'fansjs/ui';
 
 const MODULE = 'fansjs.api';
 
@@ -17,14 +19,31 @@ export class API {
     return this.request('GET', path, {...conf, args});
   }
   
-  useGet(path, args, {deps, ...conf} = {}) {
-    const [result, set_result] = useState();
-    useEffect(() => {
+  useGet(...args) {
+    const {res} = useGetController(...args);
+    return res;
+  }
+
+  useGetController(path, args, {deps, ...conf} = {}) {
+    const [res, set_res] = useState();
+
+    const refresh = useCallback(() => {
       (async () => {
-        set_result(await this.get(path, args, conf));
+        set_res(await this.get(path, args, conf));
       })();
+    }, []);
+
+    const controller = useMemo(() => {
+      return {
+        refresh,
+      };
+    }, [refresh]);
+
+    useEffect(() => {
+      refresh();
     }, [...(deps || [])]);
-    return result;
+
+    return {res, controller};
   }
   
   async post(path, data, conf) {
@@ -47,7 +66,7 @@ export class API {
       // string - expected result type
       // 'json' to get `(await fetch()).json()` result
       // 'raw' to get raw `fetch()` result
-      res = 'json',
+      res: resultType = 'json',
     },
   ) {
     const url = makeURL(this.host, path, args);
@@ -55,7 +74,7 @@ export class API {
     console.debug(`${MODULE} fetch`, url, options);
     try {
       const res = await fetch(url, options);
-      if (res === 'raw') {
+      if (resultType === 'raw') {
         return res;
       }
       if (res.status === 200) {
@@ -71,13 +90,24 @@ export class API {
           throw Error(`todo: content type ${contentType}`);
         }
       } else {
-        // TODO: use onError handler
-        console.log(`${MODULE} error response`, res.status);
+        // TODO: how to ensure res is fastapi?
+        let errorText = res.statusText;
+        try {
+          const detail = (await res.json()).detail;
+          if (detail) {
+            errorText = _.isString(detail) ? detail : JSON.stringify(detail);
+          }
+        } catch (exc) {
+          // noop
+        }
+        message.error(errorText);
+        throw res;
       }
       return res;
     } catch (exc) {
       // TODO: use onError handler
       console.log(`${MODULE} fetch failed`, exc);
+      throw exc;
     }
   }
 }

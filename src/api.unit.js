@@ -13,23 +13,27 @@ describe('API', () => {
 
   describe('POST', () => {
     describe('json', () => {
+
       it('return json', async () => {
         const data = {name: 'evo'};
-        const reqJson = data;
-        const resJson = data;
         fetch.mockResolvedValueOnce({
           status: 200,
-          json: async () => resJson,
+          json: async () => data,
           headers: new Headers({'content-type': 'application/json'}),
         });
-        expect(await new API().post('/', reqJson)).toEqual(resJson);
+        expect(await new API().post('/')).toEqual(data);
       });
 
       it('can specify raw res return', async () => {
-        const res = {};
+        const res = {
+          status: 200,
+          json: async () => {name: 'evo'},
+          headers: new Headers({'content-type': 'application/json'}),
+        };
         fetch.mockResolvedValueOnce(res);
-        expect(await new API().post('/')).toBe(res);
+        expect(await new API().post('/', null, {res: 'raw'})).toEqual(res);
       });
+
     });
 
     it('can post text', () => {
