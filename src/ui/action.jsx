@@ -33,7 +33,7 @@ export function Actions({actions, data}) {
   return (
     <div className="horz xs-margin">
       {actions.map(action => (
-        <Action key={getKey(action)} action={action} data={data}/>
+        <Action key={getKey(action)} action={action} data={data || action.data}/>
       ))}
     </div>
   );
@@ -94,8 +94,12 @@ function getActionTrigger(action) {
 }
 
 function handleOnClick({action, data}) {
+  const origData = data;
+  if (action.pre) {
+    data = action.pre(data);
+  }
   switch (action.type) {
-    case 'edit':
+    case 'edit': {
       const modal = Modal.info({
         title: action.title,
         content: (
@@ -103,7 +107,7 @@ function handleOnClick({action, data}) {
             data={data}
             save={(data) => {
               if (action.done) {
-                action.done(data);
+                action.done(data, origData);
               }
               modal.destroy();
             }}
@@ -115,6 +119,7 @@ function handleOnClick({action, data}) {
         width: '60em',
       });
       break;
+    }
     default:
       if (action.done) {
         action.done(data);
