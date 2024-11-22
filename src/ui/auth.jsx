@@ -76,7 +76,11 @@ function useUser() {
     if (token) {
       try {
         const data = jose.decodeJwt(token);
-        set_data({username: data.user, refreshed: true});
+        set_data({
+          username: data.username,
+          admin: data.admin,
+          refreshed: true,
+        });
       } catch (e) {
         console.error('user.refresh exception', e);
         set_data({username: undefined, refreshed: true});

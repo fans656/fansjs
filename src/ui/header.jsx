@@ -19,13 +19,16 @@ export function Header({
     const link = links.filter(d => d.path.startsWith(location.pathname))[0];
     return link ? [link.path] : [];
   }, [links, location.pathname]);
+  const user = Auth.useUser();
   if (links && !children) {
     children = (
       <Menu
         theme="dark"
         mode="horizontal"
         selectedKeys={selectedKeys}
-        items={links.map(link => ({
+        items={links.filter(link => {
+          return !link.admin || user.admin;
+        }).map(link => ({
           key: link.key,
           label: (
             <Routed.Link to={link.path}>
