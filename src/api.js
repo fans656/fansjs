@@ -13,25 +13,107 @@ export class API {
     host = '',  // 
   ) {
     this.host = host;
+    
+    this.use = () => {
+    };
+    
+    this.use.get
   }
   
-  async get(path, args, conf) {
-    return this.request('GET', path, {...conf, args});
+  /*
+  Sample usage:
+  
+      // path only
+      await get('/api/users');
+      
+      // params
+      await get('/api/users', {params: {offset: 100, limit: 50}});
+      
+      // conf
+      await get('/api/users', {res: 'raw'});
+  */
+  async get(path, conf) {
+    return this.request(path, {...conf, method: 'GET'});
   }
   
-  useGet(...args) {
-    const {res} = useGetController(...args);
-    return res;
+  /*
+  Sample usage:
+  
+      // path only
+      await post('/api/login');
+      
+      // data
+      await post('/api/login', {data: {username: 'foo', password: 'bar'}});
+      
+      // params
+      await post('/api/login', {params: {grant_type: 'code'}});
+      
+      // conf
+      await post('/api/login', {res: 'raw'});
+  */
+  async post(path, conf) {
+    return this.request(path, {...conf, method: 'POST'});
+  }
+  
+  async request(
+    /*
+    string - request path, e.g. '/api/lgoin'
+    */
+    path,
+
+    /*
+    request configuration: {
+
+      method: string - request method, e.g. 'GET' / 'POST'
+
+      params: object - request query parameters
+
+      data: union { - request body data
+        object - JSON data
+      }
+
+      parse: string|bool - way to parse response body
+        'json' - `return await (await fetch()).json()`
+        false - `return await fetch()`
+    }
+    */
+    conf = {},
+  ) {
+    const fetchArgs = [
+      makeFetchResource(this.host, path, conf.params),
+      makeFetchOptions(conf),
+    ];
+    console.debug(`${MODULE} fetch`, ...fetchArgs);
+    try {
+      const res = await fetch(...fetchArgs);
+      return await handleResult(res, conf);
+    } catch (exc) {
+      console.debug(`${MODULE} fetch failed`, exc);
+      throw exc;
+    }
   }
 
-  useGetController(path, args, {deps, ...conf} = {}) {
+  /*
+  Sample usage:
+  
+      // path only
+      const res = useGet('/api/users');
+      
+      // deps
+      const res = useGet('/api/users', {deps: [nonce]});
+      
+      // controller
+      const [res, controller] = useGet('/api/users', {controller: true});
+      controller.refresh();
+  */
+  useGet = (path, {deps = [], ...conf} = {}) => {
     const [res, set_res] = useState();
 
     const refresh = useCallback(() => {
       (async () => {
-        set_res(await this.get(path, args, conf));
+        set_res(await this.get(path, conf));
       })();
-    }, []);
+    }, [path, ...deps]);
 
     const controller = useMemo(() => {
       return {
@@ -41,99 +123,95 @@ export class API {
 
     useEffect(() => {
       refresh();
-    }, [...(deps || [])]);
+    }, [refresh]);
 
-    return {res, controller};
-  }
-  
-  async post(path, data, conf) {
-    return this.request('POST', path, {...conf, data});
-  }
-  
-  async request(
-    // string - 'GET' | 'POST'
-    method,
-    // string - e.g. '/api/lgoin'
-    path,
-    // dict - conf
-    {
-      // object - request query parameters
-      args,
-      
-      // object - request body
-      data,
-
-      // string - expected result type
-      // 'json' to get `(await fetch()).json()` result
-      // 'raw' to get raw `fetch()` result
-      res: resultType = 'json',
-    },
-  ) {
-    const url = makeURL(this.host, path, args);
-    const options = makeOptions(method, {data});
-    console.debug(`${MODULE} fetch`, url, options);
-    try {
-      const res = await fetch(url, options);
-      if (resultType === 'raw') {
-        return res;
-      }
-      if (res.status === 200) {
-        const contentType = res.headers.get('Content-Type');
-        if (contentType === 'application/json') {
-          try {
-            return await res.json();
-          } catch (exc) {
-            console.log(`${MODULE} error parsing json`, exc);
-          }
-        } else {
-          // TODO: other content type
-          throw Error(`todo: content type ${contentType}`);
-        }
-      } else {
-        // TODO: how to ensure res is fastapi?
-        let errorText = res.statusText;
-        try {
-          const detail = (await res.json()).detail;
-          if (detail) {
-            errorText = _.isString(detail) ? detail : JSON.stringify(detail);
-          }
-        } catch (exc) {
-          // noop
-        }
-        message.error(errorText);
-        throw res;
-      }
-      return res;
-    } catch (exc) {
-      // TODO: use onError handler
-      console.log(`${MODULE} fetch failed`, exc);
-      throw exc;
-    }
+    return conf.controller ? [res, controller] : res;
   }
 }
 
-export function makeURL(host, path, args) {
+function makeFetchResource(host, path, params) {
   let url = host + path;
-  if (args) {
-    url += '?' + qs.stringify(args);
+  if (params) {
+    url += '?' + qs.stringify(params);
   }
   return url;
 }
 
-export function makeOptions(method, conf) {
+// TODO: more types of data (e.g. blob, etc)
+// see https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#setting_a_body
+function makeFetchOptions({method = 'GET', data} = {}) {
   const options = {
     method,
     headers: new Headers(),
   };
-  if (conf.data) {
-    // TODO: more types of data
-    // see https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#setting_a_body
-    if (_.isObject(conf.data)) {
-      options.body = JSON.stringify(conf.data);
+  if (data) {
+    if (_.isObject(data)) {
+      options.body = JSON.stringify(data);
       options.headers.append('Content-Type', 'application/json');
     } else {
-      throw Error(`unsupported data type ${typeof conf.data}`);
+      throw Error(`unsupported data type ${typeof data}`);
     }
   }
   return options;
 }
+
+async function handleResult(res, conf) {
+  const {parse = 'json'} = conf;
+  if (!parse) {
+    return res;
+  }
+  switch (parse) {
+    case 'json':
+      return await handleJsonResult(res, {...conf, parse});
+    default:
+      throw `unsupported parse type ${parse}`
+  }
+}
+
+async function handleJsonResult(res, conf) {
+  if (res.status === 200) {
+    try {
+      return await res.json();
+    } catch (exc) {
+      console.log(`${MODULE} error parsing json`, exc);
+      throw exc;
+    }
+  } else {
+    const error = await getError(res, conf);
+    await handleError(error);
+    throw res;  // allow caller to catch error res
+  }
+}
+
+function handleError(error) {
+  switch (error.type) {
+    case 'text':
+      if (typeof document !== 'undefined') {
+        message.error(error.value);
+      }
+      return true;
+    default:
+      return false;
+  }
+}
+
+async function getError(res, {parse}) {
+  let errorText = res.statusText;
+  if (parse === 'json') {
+    try {
+      const detail = (await res.json()).detail;
+      if (detail) {
+        errorText = _.isString(detail) ? detail : JSON.stringify(detail);
+      }
+    } catch (exc) {
+      // noop
+    }
+  }
+  return {type: 'text', value: errorText};
+}
+
+// unit test
+export {
+  makeFetchResource,
+  makeFetchOptions,
+};

@@ -38,8 +38,8 @@ Build app:
 
 Unit test:
 
-    npm run unit
+    ./unit.sh
 
 Unit test (specific test):
 
-    npm run unit -- --testNamePattern 'return json'
+    ./unit.sh '<pattern>'
