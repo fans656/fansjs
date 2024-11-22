@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import qs from 'qs';
 import _ from 'lodash';
+import { notification } from 'antd';
 
-import { message } from 'fansjs/ui';
+import { Code, message } from 'fansjs/ui';
 
 const MODULE = 'fansjs.api';
 
@@ -190,24 +191,37 @@ function handleError(error) {
         message.error(error.value);
       }
       return true;
+    case 'json':
+      if (typeof document !== 'undefined') {
+        notification.error({
+          description: (
+            <Code>{JSON.stringify(error.value, null, 2)}</Code>
+          ),
+          duration: null,
+        });
+      }
+      return true;
     default:
       return false;
   }
 }
 
 async function getError(res, {parse}) {
-  let errorText = res.statusText;
   if (parse === 'json') {
     try {
       const detail = (await res.json()).detail;
       if (detail) {
-        errorText = _.isString(detail) ? detail : JSON.stringify(detail);
+        if (_.isString(detail)) {
+          return {type: 'text', value: errorText};
+        } else {
+          return {type: 'json', value: detail};
+        }
       }
     } catch (exc) {
       // noop
     }
   }
-  return {type: 'text', value: errorText};
+  return {type: 'text', value: res.statusText};
 }
 
 // unit test

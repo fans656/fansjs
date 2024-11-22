@@ -71,43 +71,27 @@ function AuthUser() {
   return (
     <div style={{paddingRight: '1em'}}>
       {user.username ? (
-        <Dropdown
-          menu={{
-            items: [
-              {key: 'profile', label: 'Profile'},
-              {key: 'logout', label: 'Logout'},
-            ],
-            onClick: ({key}) => {
-              switch (key) {
-                case 'profile': {
-                  Modal.info({
-                    title: 'Profile',
-                    content: <Auth.Profile user={user}/>,
-                    icon: null,
-                    maskClosable: true,
-                  });
-                } break;
-                case 'logout': {
-                  Cookies.remove('token');
-                  user.refresh();
-                } break;
-                default:
-                  break;
-              }
-            },
+        <span
+          className="clickable"
+          onClick={() => {
+            const modal = Modal.info();
+            modal.update({
+              title: 'Profile',
+              content: <Auth.Profile user={user} done={modal.destroy}/>,
+              icon: null,
+              maskClosable: true,
+            });
           }}
-          trigger="click"
         >
-          <span className="clickable">
-            {user.username}
-          </span>
-        </Dropdown>
+          {user.username}
+        </span>
       ) : (
         <span
           className="clickable"
           onClick={() => {
             const modal = Modal.info();
             modal.update({
+              title: 'Login',
               content: <Auth.Login user={user} done={modal.destroy}/>,
               icon: null,
               footer: null,
