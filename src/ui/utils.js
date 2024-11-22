@@ -20,6 +20,7 @@ export function normalizedLink(d) {
 export function normalizedFormField(field) {
   field = {...field};
 
+  // normalize type (e.g. password -> input, submit -> button)
   switch (field.type) {
     case 'password':
       field.type = 'input';
@@ -35,7 +36,13 @@ export function normalizedFormField(field) {
       break;
   }
 
+  // normalize attr (e.g. button -> nolabel)
   switch (field.type) {
+    case 'input':
+      if (field.enter == null) {
+        field.enter = true;
+      }
+      break;
     case 'button':
       field.nolabel = true;
       break;
