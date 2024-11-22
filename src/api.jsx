@@ -191,16 +191,6 @@ function handleError(error) {
         message.error(error.value);
       }
       return true;
-    case 'json':
-      if (typeof document !== 'undefined') {
-        notification.error({
-          description: (
-            <Code>{JSON.stringify(error.value, null, 2)}</Code>
-          ),
-          duration: null,
-        });
-      }
-      return true;
     default:
       return false;
   }
@@ -211,11 +201,7 @@ async function getError(res, {parse}) {
     try {
       const detail = (await res.json()).detail;
       if (detail) {
-        if (_.isString(detail)) {
-          return {type: 'text', value: errorText};
-        } else {
-          return {type: 'json', value: detail};
-        }
+        return {type: 'text', value: detail};
       }
     } catch (exc) {
       // noop
