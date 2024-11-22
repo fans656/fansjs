@@ -21,10 +21,10 @@ Auth.useUser = () => {
   return React.useContext(UserContext);
 };
 
-Auth.Profile = ({user, done}) => {
+Auth.Profile = ({user, done = noop, ...props}) => {
   user = user || Auth.useUser();
   return (
-    <div className="vert xs-margin">
+    <div className="vert xs-margin" {...props}>
       <div>Username: {user.username}</div>
       <div>
         <Action
@@ -49,9 +49,8 @@ Auth.Profile = ({user, done}) => {
             name: 'Log out',
             done: () => {
               user.logout();
-              if (done) {
-                done();
-              }
+              message.success('Logged out');
+              done();
             },
           }}
         />
@@ -60,7 +59,7 @@ Auth.Profile = ({user, done}) => {
   );
 };
 
-Auth.Login = ({user, done, ...props}) => {
+Auth.Login = ({user, done = noop, ...props}) => {
   user = user || Auth.useUser();
   return (
     <Form
@@ -79,9 +78,8 @@ Auth.Login = ({user, done, ...props}) => {
         switch (res.status) {
           case 200:
             user.refresh();
-            if (done) {
-              done();
-            }
+            message.success('Logged in');
+            done();
             break;
           case 400:
             message.error((await res.json()).detail);
@@ -115,6 +113,7 @@ function ChangePassword({user, done = noop}) {
             old_password: values.old_password,
             new_password: values.new_password,
           }})
+          message.success('Changed');
           done();
         } else {
           message.error('Mismatch');
