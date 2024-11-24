@@ -1,3 +1,4 @@
+export { App } from './app';
 export { Auth } from './auth';
 export { Routed } from './routed';
 export { Layout } from './layout';
@@ -9,6 +10,7 @@ export { Table } from './table';
 export { Edit } from './edit';
 export { Actions, Action } from './action';
 export { message } from './message';
+export { dialog } from './dialog';
 
 import styleInject from 'style-inject';
 

@@ -8,6 +8,10 @@ export function getLabel(d) {
   return d.label || _.capitalize(d.name) || d.key;
 }
 
+export function getPath(d) {
+  return d.path || `/${d.name}`;
+}
+
 export function normalizedLink(d) {
   return {
     ...d,
@@ -50,8 +54,8 @@ export function normalizedFormField(field) {
       break;
   }
   
-  field.key = field.key || field.name || field.label;
-  field.label = field.label || field.name || field.key;
+  field.key = getKey(field);
+  field.label = getLabel(field);
 
   return field;
 }

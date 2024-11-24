@@ -3,7 +3,7 @@ import { Form as AntdForm, Input } from 'antd';
 
 import { Button } from 'fansjs/ui';
 
-import { normalizedFormField } from './utils';
+import { normalizedFormField, getLabel } from './utils';
 
 export function Form({
   fields = [],
@@ -59,7 +59,7 @@ function Field({field, conf, form, prefix}) {
           type={field.primary ? 'primary' : null}
           onClick={field.submit ? form.submit : null}
         >
-          {field.label || field.name}
+          {field.label}
         </Button>
       );
       break;
