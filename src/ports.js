@@ -9,4 +9,5 @@ export const ports = {
   'stome_desktop':  6660,
 
   'fansjs_dev':     16501,
+  'auth_web':       16502,
 };

@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { Layout as AntdLayout, Menu, Dropdown, Modal } from 'antd';
 import Cookies from 'js-cookie';
+import qs from 'qs';
 
 import { API } from 'fansjs';
 import { Routed, Code, Action, Form, Auth, message } from 'fansjs/ui';
@@ -10,7 +11,14 @@ import { normalizedLink } from './utils';
 export function Header({
   links = [],
   style = {},
+
+  /**
+   * @param {bool|string} - Use authorization provider
+   * 
+   * true means use https://auth.fans656.me
+   */
   auth = false,
+
   children,
 }) {
   links = links.map(normalizedLink);
@@ -88,15 +96,20 @@ function AuthUser() {
       ) : (
         <span
           className="clickable"
-          onClick={() => {
-            const modal = Modal.info();
-            modal.update({
-              title: 'Login',
-              content: <Auth.Login user={user} done={modal.destroy}/>,
-              icon: null,
-              footer: null,
-              maskClosable: true,
-            });
+          onClick={ev => {
+            // TODO: check if origin is same as provider
+            if (false) {
+              const modal = Modal.info();
+              modal.update({
+                title: 'Login',
+                content: <Auth.Login user={user} done={modal.destroy}/>,
+                icon: null,
+                footer: null,
+                maskClosable: true,
+              });
+            } else {
+              window.open(makeLoginUrl());
+            }
           }}
         >
           Login
@@ -104,4 +117,10 @@ function AuthUser() {
       )}
     </div>
   );
+}
+
+function makeLoginUrl() {
+  return 'https://auth.fans656.me/login?' + qs.stringify({
+    'redirect_uri': window.location.href,
+  });
 }

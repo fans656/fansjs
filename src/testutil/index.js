@@ -1,0 +1,1 @@
+export { Intetest } from './intetest';
