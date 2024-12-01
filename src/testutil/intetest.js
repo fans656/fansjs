@@ -13,11 +13,18 @@ export class Intetest {
     this.origin = origin;
   }
   
-  async verify(page, path, verify_func) {
-    await page.goto(`${this.origin}${path}`);
-    await verify_func({
-      elem: async (...args) => await verifyElem(page, ...args),
-    });
+  async verify(page, ...args) {
+    if (_.isFunction(args[1])) {
+      const [path, verify_func] = args;
+      await page.goto(`${this.origin}${path}`);
+      await verify_func({
+        elem: async (...args) => await verifyElem(page, ...args),
+      });
+    } else if (_.isObject(args[1])) {
+      await verifyElem(page, ...args);
+    } else {
+      throw `unsupported args: ${JSON.stringify(args)}`;
+    }
   }
 }
 
@@ -26,6 +33,10 @@ export async function verifyElem(page, selector, spec) {
 
   if (spec.type) {
     expect(await loc.evaluate(e => e.tagName.toLowerCase())).toBe(spec.type);
+  }
+
+  if (spec.text) {
+    expect(await loc.textContent()).toBe(spec.text);
   }
 
   if (spec.attrs) {

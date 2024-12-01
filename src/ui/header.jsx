@@ -16,6 +16,7 @@ export function Header({
    * @param {bool|string} - Use authorization provider
    * 
    * true means use https://auth.fans656.me
+   * '/' means dialog login form
    */
   auth = false,
 
@@ -54,7 +55,7 @@ export function Header({
         <div className="horz flex-1">
           {children}
         </div>
-        <AuthUser/>
+        <AuthUser provider={auth}/>
       </div>
     );
   }
@@ -74,7 +75,7 @@ export function Header({
   );
 }
 
-function AuthUser() {
+function AuthUser({provider}) {
   const user = Auth.useUser();
   return (
     <div style={{paddingRight: '1em'}}>
@@ -95,10 +96,10 @@ function AuthUser() {
         </span>
       ) : (
         <span
+          id="goto-login"
           className="clickable"
           onClick={ev => {
-            // TODO: check if origin is same as provider
-            if (false) {
+            if (provider === '/') {
               const modal = Modal.info();
               modal.update({
                 title: 'Login',
@@ -108,7 +109,7 @@ function AuthUser() {
                 maskClosable: true,
               });
             } else {
-              window.open(makeLoginUrl());
+              window.open(makeLoginUrl(provider));
             }
           }}
         >
@@ -119,8 +120,11 @@ function AuthUser() {
   );
 }
 
-function makeLoginUrl() {
-  return 'https://auth.fans656.me/login?' + qs.stringify({
+function makeLoginUrl(provider) {
+  if (provider === true) {
+    provider = 'https://auth.fans656.me/login';
+  }
+  return `${provider}?` + qs.stringify({
     'redirect_uri': window.location.href,
   });
 }

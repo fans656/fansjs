@@ -22,7 +22,7 @@ export function Action({action, data}) {
   const Trigger = getActionTrigger(action);
   return (
     <Wrapper>
-      <a onClick={() => handleOnClick({action, data})}>
+      <a id={action.id} onClick={() => handleOnClick({action, data})}>
         {getLabel(action)}
       </a>
     </Wrapper>

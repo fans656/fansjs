@@ -25,7 +25,7 @@ Auth.Profile = ({user, done = noop, ...props}) => {
   user = user || Auth.useUser();
   return (
     <div className="vert xs-margin" {...props}>
-      <div>Username: {user.username}</div>
+      <div>Username: <span className="username">{user.username}</span></div>
       <div>
         <Action
           action={{
@@ -47,6 +47,7 @@ Auth.Profile = ({user, done = noop, ...props}) => {
         <Action
           action={{
             name: 'Log out',
+            id: 'logout',
             done: () => {
               user.logout();
               message.success('Logged out');

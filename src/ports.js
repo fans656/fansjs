@@ -1,13 +1,8 @@
 export const ports = {
-  'auth':           6560,
-  'fme':            6561,
-  'quantix':        6562,
-  'doy':            6563,
+  'quantix':          6562,
 
-  'stome':          6565,
-
-  'stome_desktop':  6660,
-
-  'fansjs_dev':     16501,
-  'auth_web':       16502,
+  'auth_back':        16510,
+  'auth_web':         16511,
+  'auth_res_back':    16512,
+  'auth_res_web':     16513,
 };
