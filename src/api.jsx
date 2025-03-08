@@ -190,6 +190,7 @@ function handleError(error) {
       if (typeof document !== 'undefined') {
         message.error(error.value);
       }
+      console.error(`${MODULE} error: ${error.value}`);
       return true;
     default:
       return false;

@@ -1,1 +1,0 @@
-export { Intetest } from './intetest';

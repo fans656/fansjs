@@ -61,6 +61,7 @@ export function Header({
   }
   return (
     <AntdLayout.Header
+      className="header"
       style={{
         position: 'sticky',
         top: 0,
@@ -81,7 +82,7 @@ function AuthUser({provider}) {
     <div style={{paddingRight: '1em'}}>
       {user.username ? (
         <span
-          className="clickable"
+          className="username clickable"
           onClick={() => {
             const modal = Modal.info();
             modal.update({
@@ -124,7 +125,11 @@ function makeLoginUrl(provider) {
   if (provider === true) {
     provider = 'https://auth.fans656.me/login';
   }
-  return `${provider}?` + qs.stringify({
+  // TODO: custom grant endpoint
+  const redirect_uri = `${window.location.origin}/grant?` + qs.stringify({
     'redirect_uri': window.location.href,
+  });
+  return `${provider}?` + qs.stringify({
+    'redirect_uri': redirect_uri,
   });
 }

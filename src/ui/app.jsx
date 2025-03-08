@@ -3,10 +3,17 @@ import { Auth, Layout, Routed } from 'fansjs/ui';
 import { getLabel, getPath } from './utils';
 
 export function App({
+  auth = true,
   children,
 }) {
   const links = children.map(toLink);
-  const routes = children.map(d => toRoute(d, links));
+  if (auth !== '/') {
+    children = [
+      {name: 'grant', comp: <Auth.Grant/>, path: '/grant'},
+      ...children,
+    ];
+  }
+  const routes = children.map(d => toRoute(d, links, {auth}));
   return (
     <Auth>
       <Routed>
@@ -16,12 +23,12 @@ export function App({
   );
 }
 
-function Page({links = [], children}) {
+function Page({links = [], auth, children}) {
   return (
     <Layout>
       <Layout.Header
         links={links}
-        auth={true}
+        auth={auth}
       />
       <Layout.Content>
         {children}
@@ -30,11 +37,11 @@ function Page({links = [], children}) {
   );
 }
 
-function toRoute(spec, links) {
+function toRoute(spec, links, {auth}) {
   return {
     path: getPath(spec),
     comp: (
-      <Page links={links}>
+      <Page links={links} auth={auth}>
         {spec.comp}
       </Page>
     ),

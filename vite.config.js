@@ -39,7 +39,6 @@ export default defineConfig(({mode}) => {
           entry: {
             'index': pathlib.resolve(__dirname, 'src/index.js'),
             'ui': pathlib.resolve(__dirname, 'src/ui/index.js'),
-            'testutil': pathlib.resolve(__dirname, 'src/testutil/index.js'),
           },
         },
         rollupOptions: {

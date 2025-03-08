@@ -4,7 +4,7 @@ import * as jose from 'jose';
 import { Modal } from 'antd';
 
 import { API, noop } from 'fansjs';
-import { Form, Action, message } from 'fansjs/ui';
+import { Form, Action, Routed, message } from 'fansjs/ui';
 
 const UserContext = React.createContext();
 
@@ -60,7 +60,7 @@ Auth.Profile = ({user, done = noop, ...props}) => {
   );
 };
 
-Auth.Login = ({user, done = noop, ...props}) => {
+Auth.Login = ({user, req = {}, done = noop, ...props}) => {
   user = user || Auth.useUser();
   return (
     <Form
@@ -71,16 +71,19 @@ Auth.Login = ({user, done = noop, ...props}) => {
         {name: 'login', label: 'Login', type: 'submit'},
       ]}
       submit={async ({username, password}) => {
-        // TODO: login using given auth provider
         const res = await new API().post('/api/login', {
-          data: {username, password},
+          data: {
+            username,
+            password,
+            ...req,
+          },
           parse: false,
         });
         switch (res.status) {
           case 200:
             user.refresh();
             message.success('Logged in');
-            done();
+            done({res});
             break;
           case 400:
             message.error((await res.json()).detail);
@@ -95,6 +98,30 @@ Auth.Login = ({user, done = noop, ...props}) => {
         }
       }}
     />
+  );
+};
+
+Auth.Grant = () => {
+  const query = Routed.useQuery();
+  const grantRef = React.useRef();
+  useEffect(() => {
+    if (query.grant !== grantRef.current) {
+      grantRef.current = query.grant;
+      if (grantRef.current) {
+        (async () => {
+          await new API().post('/api/grant', {data: {
+            auth_server: query.auth_server,
+            grant: query.grant,
+          }});
+          window.location.href = query.redirect_uri;
+        })();
+      }
+    }
+  }, [query.grant]);
+  return (
+    <div>
+      grant
+    </div>
   );
 };
 
@@ -156,7 +183,12 @@ function useUser() {
   }, []);
 
   const user = useMemo(() => {
-    return {...data, refresh, logout};
+    return {
+      ...data,
+      valid: data && data.username != null,
+      refresh,
+      logout,
+    };
   }, [data, refresh, logout]);
   
   return user;
