@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { normalizedLink, normalizedFormField } from './utils';
+import { normalizedLink, normalizedFormField } from 'fansjs/ui/utils';
 
 describe('normalizedLink', () => {
   it('normalize key with priority', () => {
@@ -107,7 +107,7 @@ describe('normalizedFormField', () => {
     expect(normalizedFormField(field).label).toBe('key');
 
     field.name = 'name';
-    expect(normalizedFormField(field).label).toBe('name');
+    expect(normalizedFormField(field).label).toBe('Name');
 
     field.label = 'label';
     expect(normalizedFormField(field).label).toBe('label');

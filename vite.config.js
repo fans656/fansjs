@@ -63,7 +63,7 @@ function collectDocs() {
       const files = await glob(pathlib.resolve(__dirname, 'src/**/*.doc.js'));
       const docs = files.map((file, index) => {
         const path = file.substring(root.length + 1);
-        const id = path.replace('/', '.').replace(/\.doc\.js$/, '');
+        const id = path.replace(/\/__docs__/, '').replace('/', '.').replace(/\.doc\.js$/, '');
         const data = `doc${index}`
         return {id, data, file, path: '../' + path};
       });
@@ -77,6 +77,7 @@ function collectDocs() {
           if (testcase.app) {
             const relpath = `doc/testcases.generated/${testcaseId}.jsx`;
             const path = pathlib.resolve(__dirname, 'src', relpath);
+            ensureParent(path);
             fs.writeFileSync(path, dedent(testcase.app));
             testcaseApps.push({
               id: testcaseId,
@@ -90,6 +91,7 @@ function collectDocs() {
           if (sample.app) {
             const relpath = `doc/samples.generated/${sampleId}.jsx`;
             const path = pathlib.resolve(__dirname, 'src', relpath);
+            ensureParent(path);
             fs.writeFileSync(path, dedent(sample.app));
             sampleApps.push({
               id: sampleId,
@@ -138,4 +140,13 @@ function collectDocs() {
       fs.writeFileSync(pathlib.resolve(__dirname, 'src/doc/index.js'), content);
     },
   };
+}
+
+function ensureParent(fpath) {
+  const dirname = pathlib.dirname(fpath);
+  try {
+    fs.mkdirSync(dirname, {recursive: true});
+  } catch (err) {
+    if (err.code !== 'EEXIST') throw err;
+  }
 }

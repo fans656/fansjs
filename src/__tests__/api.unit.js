@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { API, makeFetchResource, makeFetchOptions } from './api';
+import { API, makeFetchResource, makeFetchOptions } from '../api';
 
 import { mockFetch } from './api.testutils';
 

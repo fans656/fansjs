@@ -24,7 +24,7 @@ export function Routed({children = []}) {
         v7_skipActionErrorRevalidation: true,
       },
     });
-  }, [children]);
+  }, []);
   return (
     <RouterProvider
       router={router}

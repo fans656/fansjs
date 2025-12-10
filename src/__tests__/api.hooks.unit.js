@@ -6,7 +6,7 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 
 import { mockFetch, hooked } from './api.testutils';
 
-import { API } from './api';
+import { API } from '../api';
 
 describe('API', () => {
   const api = new API();
