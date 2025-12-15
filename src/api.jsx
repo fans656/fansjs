@@ -11,14 +11,20 @@ export class API {
   constructor(
     // e.g. https://auth.fans656.me
     // default will request to same domain
-    host = '',  // 
+    origin = '',  // 
   ) {
-    this.host = host;
+    this.origin = origin;
     
     this.use = () => {
     };
     
     this.use.get
+  }
+  
+  useOrigin(origin) {
+    useEffect(() => {
+      this.origin = origin;
+    }, [origin]);
   }
   
   /*
@@ -81,7 +87,7 @@ export class API {
     conf = {},
   ) {
     const fetchArgs = [
-      makeFetchResource(this.host, path, conf.params),
+      makeFetchUrl(this.origin, path, conf.params),
       makeFetchOptions(conf),
     ];
     console.debug(`${MODULE} fetch`, ...fetchArgs);
@@ -130,8 +136,8 @@ export class API {
   }
 }
 
-function makeFetchResource(host, path, params) {
-  let url = host + path;
+function makeFetchUrl(origin, path, params) {
+  let url = origin + path;
   if (params) {
     url += '?' + qs.stringify(params);
   }
@@ -164,6 +170,8 @@ async function handleResult(res, conf) {
   switch (parse) {
     case 'json':
       return await handleJsonResult(res, {...conf, parse});
+    case 'text':
+      return await res.text();
     default:
       throw `unsupported parse type ${parse}`
   }
@@ -213,6 +221,6 @@ async function getError(res, {parse}) {
 
 // unit test
 export {
-  makeFetchResource,
+  makeFetchUrl,
   makeFetchOptions,
 };

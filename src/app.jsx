@@ -1,143 +1,168 @@
-import {
-  Routed, Layout, Toc, Code,
-} from 'fansjs/ui';
+import React, { useEffect } from 'react';
+import qs from 'qs';
 
-import { docs } from 'src/doc';
+import { Routed, Layout, Toc, Code } from 'fansjs/ui';
+
+import { docs, apps } from 'src/__generated__/docs';
+
+export default function App() {
+  const query = qs.parse(window.location.search.substring(1));
+  if (query.__app__) {
+    const app = apps[query.__app__];
+    if (app) {
+      return (
+        <RenderedApp app={app}/>
+      );
+    } else {
+      return (
+        <div>app {query.__app__} not found</div>
+      );
+    }
+  } else {
+    return (
+      <Routed header={header}>{pages}</Routed>
+    );
+  }
+}
+
+const header = [
+  {label: 'Docs', path: '/'},
+  //{label: 'Testcases', path: '/testcase'},
+];
 
 const pages = [
-  {
-    path: '/testcase/:id',
-    comp: (
-      <Testcase/>
-    ),
-  },
-  {
-    path: '/testcase',
-    comp: (
-      <Page>
-        <Testcases/>
-      </Page>
-    ),
-  },
+  //{
+  //  path: '/testcase/:id',
+  //  comp: (
+  //    <Testcase/>
+  //  ),
+  //  raw: true,
+  //},
+  //{
+  //  path: '/testcase',
+  //  comp: (
+  //    <Page>
+  //      <Testcases/>
+  //    </Page>
+  //  ),
+  //},
   {
     path: '/',
-    comp: (
-      <Page>
-        <Docs/>
-      </Page>
-    ),
+    comp: <Docs/>,
   },
 ];
 
-export default function App() {
-  return (
-    <Routed>
-      {pages}
-    </Routed>
-  );
-}
-
-function Page({children}) {
-  return (
-    <Layout>
-      <Layout.Header
-        links={[
-          {label: 'Doc', path: '/'},
-          {label: 'Testcase', path: '/testcase'},
-        ]}
-        style={{zIndex: 999}}
-      />
-      {children}
-    </Layout>
-  );
-}
-
-function Testcases() {
-  return (
-    <div>
-      {docs.docs.map(doc => (
-        <div key={doc.id}>
-          <h3 key={doc.id}>{doc.title}</h3>
-          <div>
-            {Object.values(doc.testcases).map(testcase => (
-              <div key={testcase.id} style={{display: 'flex'}}>
-                <div style={{width: '40em', fontFamily: 'Consolas'}}>
-                  <Routed.Link to={`/testcase/${testcase.id}`}>
-                    {testcase.id}
-                  </Routed.Link>
-                </div>
-                <div>{testcase.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function Testcase() {
-  const {id} = Routed.useParams();
-  const testcase = docs.testcases[id];
-  return testcase ? <testcase.App/> : null;
-}
+//function Testcases() {
+//  return (
+//    <div>
+//      {docs.docs.map(doc => (
+//        <div key={doc.id}>
+//          <h3 key={doc.id}>{doc.title}</h3>
+//          <div>
+//            {Object.values(doc.testcases).map(testcase => (
+//              <div key={testcase.id} style={{display: 'flex'}}>
+//                <div style={{width: '40em', fontFamily: 'Consolas'}}>
+//                  <Routed.Link to={`/testcase/${testcase.id}`}>
+//                    {testcase.id}
+//                  </Routed.Link>
+//                </div>
+//                <div>{testcase.desc}</div>
+//              </div>
+//            ))}
+//          </div>
+//        </div>
+//      ))}
+//    </div>
+//  );
+//}
+//
+//function Testcase() {
+//  const {id} = Routed.useParams();
+//  const testcase = docs.testcases[id];
+//  return testcase ? <testcase.App/> : null;
+//}
 
 function Docs() {
-  const {cur} = Routed.useQuery();
-  const curDoc = docs[cur];
+  const query = Routed.useQuery();
+  const currentDoc = docs[query.cur];
   return (
     <Layout>
       <Layout.Left>
         <Toc
-          data={docs.docs.map(doc => ({
+          data={Object.values(docs).map(doc => ({
             key: doc.id,
             label: doc.title,
             href: `?cur=${doc.id}`,
           }))}
-          selected={cur}
+          selected={query.cur}
         />
       </Layout.Left>
       <Layout.Content style={{padding: '0 1em'}}>
-        <Doc doc={docs[cur]}/>
+        {!!currentDoc && <Doc doc={currentDoc}/>}
       </Layout.Content>
-      {curDoc ? (
+      {false && !!currentDoc && (
         <Layout.Right>
           <Toc
-            data={curDoc.samples.map(sample => ({
+            data={currentDoc.samples.map(sample => ({
               key: sample.id,
               label: sample.title,
             }))}
           />
         </Layout.Right>
-      ) : null}
+      )}
     </Layout>
   );
 }
 
 function Doc({doc}) {
-  return doc ? (
+  return (
     <div>
-      {doc.samples.map(sample => (
-        <Sample key={sample.id} sample={sample}/>
-      ))}
+      <h2>{doc.title}</h2>
+      <div>{doc.desc}</div>
+      <div>
+        {doc.samples.map(sample => (
+          <Sample key={sample.id} sample={sample}/>
+        ))}
+      </div>
     </div>
-  ) : null;
+  );
 }
 
 function Sample({sample}) {
   return (
     <div>
       <h3>{sample.title}</h3>
-      {sample.norender ? null : (
-        <div
-          style={{
-            border: '1px solid #6495ED',
-          }}
-        >
-          <sample.App/>
-        </div>
-      )}
-      <Code>{sample.app}</Code>
+      <div>{sample.desc}</div>
+      <div className="horz margin stretch">
+        {sample.inplace === false ? (
+          <a href={`/?__app__=${sample.id}`} target="_blank">Demo app</a>
+        ) : (
+          <div
+            style={{
+              minWidth: '40em',
+              border: '1px solid #6495ED',
+            }}
+          >
+            <sample.App/>
+          </div>
+        )}
+        <Code style={{minWidth: '40em'}}>{sample.app}</Code>
+      </div>
     </div>
+  );
+}
+
+function RenderedApp({app}) {
+  useEffect(() => {
+    if (app.conf.stayInApp) {
+      document.querySelectorAll("a").forEach(link => {
+        const url = new URL(link.href);
+        url.searchParams.set('__app__', qs.parse(window.location.search.substring(1)).__app__);
+        link.href = url.toString();
+      });
+    }
+  }, []);
+  return (
+    <app.App/>
   );
 }

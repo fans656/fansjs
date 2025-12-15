@@ -1,8 +1,8 @@
 import styleInject from 'style-inject';
 
-export function Code({children}) {
+export function Code({children, style}) {
   return (
-    <pre className="fansui-code">
+    <pre className="fansui-code" style={style}>
       <code>
         {children}
       </code>
@@ -15,6 +15,7 @@ styleInject(`
     background: #eee;
     font-size: 12px;
     padding: 1em;
+    margin: 0;
   }
 
   .fansui-code > code {

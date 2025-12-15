@@ -16,7 +16,7 @@ export const doc = {
       );
     `,
   }, {
-    title: 'Cols',
+    title: 'Columns',
     app: `
       import { Table, Button } from 'fansjs/ui';
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { normalizedItem } from './toc';
+import { normalizedItem } from 'fansjs/ui/toc';
 
 describe('normalizedItem', () => {
   it('normalize label', () => {

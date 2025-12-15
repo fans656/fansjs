@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { API, makeFetchResource, makeFetchOptions } from '../api';
+import { API, makeFetchUrl, makeFetchOptions } from '../api';
 
 import { mockFetch } from './api.testutils';
 
@@ -49,14 +49,14 @@ describe('API', () => {
   });
 });
 
-describe('makeFetchResource', () => {
+describe('makeFetchUrl', () => {
   it('concatenate host and path', () => {
-    const resource = makeFetchResource('https://fans656.me', '/api/note');
+    const resource = makeFetchUrl('https://fans656.me', '/api/note');
     expect(resource).toBe('https://fans656.me/api/note');
   });
 
   it('attach query', () => {
-    const resource = makeFetchResource(
+    const resource = makeFetchUrl(
       'https://fans656.me',
       '/api/note',
       {name: 'evo', age: 16},

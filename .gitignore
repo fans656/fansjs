@@ -25,6 +25,5 @@ dist-ssr
 
 dist.app
 test-results
-samples.generated
-testcases.generated
 src/doc/index.js
+/src/__generated__

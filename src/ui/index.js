@@ -1,3 +1,4 @@
+export { Root } from './root';
 export { App } from './app';
 export { Auth } from './auth';
 export { Routed } from './routed';
@@ -8,6 +9,7 @@ export { Toc } from './toc';
 export { Code } from './code';
 export { Table } from './table';
 export { Edit } from './edit';
+export { List } from './list';
 export { Actions, Action } from './action';
 export { message } from './message';
 export { dialog } from './dialog';
@@ -75,7 +77,15 @@ styleInject(`
   justify-content: space-between;
 }
 
+.stretch {
+  align-items: stretch;
+}
+
 .clickable:hover {
   cursor: pointer;
+}
+
+.hover-background:hover {
+  background: var(--hover-background);
 }
 `);

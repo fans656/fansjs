@@ -9,12 +9,15 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 
-export function Routed({children = []}) {
+import { Layout } from './layout';
+
+export function Routed({children = [], ...options}) {
   const router = useMemo(() => {
     return createBrowserRouter(children.map(page => {
+      const element = getPageElement(page, options);
       return {
         path: page.path,
-        element: page.comp,
+        element: element,
       };
     }), {
       future: {
@@ -34,6 +37,35 @@ export function Routed({children = []}) {
       }}
     />
   );
+}
+
+function getPageElement(page, options) {
+  const content = getContent(page);
+  if (page.raw) {
+    return content;
+  }
+
+  const Wrapper = getWrapper(options);
+  if (Wrapper) {
+    return <Wrapper>{content}</Wrapper>;
+  } else {
+    return content;
+  }
+}
+
+function getContent(page) {
+  return page.comp;
+}
+
+function getWrapper(options) {
+  if (options.header) {
+    return ({children}) => (
+      <Layout>
+        <Layout.Header links={options.header}/>
+        <Layout.Content>{children}</Layout.Content>
+      </Layout>
+    );
+  }
 }
 
 Routed.Link = Link;
