@@ -100,7 +100,7 @@ function Docs() {
       <Layout.Content style={{padding: '0 1em'}}>
         {!!currentDoc && <Doc doc={currentDoc}/>}
       </Layout.Content>
-      {false && !!currentDoc && (
+      {!!currentDoc && (
         <Layout.Right>
           <Toc
             data={currentDoc.samples.map(sample => ({
@@ -130,7 +130,7 @@ function Doc({doc}) {
 
 function Sample({sample}) {
   return (
-    <div>
+    <section id={sample.id}>
       <h3>{sample.title}</h3>
       <div>{sample.desc}</div>
       <div className="horz margin stretch">
@@ -141,6 +141,7 @@ function Sample({sample}) {
             style={{
               minWidth: '40em',
               border: '1px solid #6495ED',
+              padding: 10,
             }}
           >
             <sample.App/>
@@ -148,7 +149,7 @@ function Sample({sample}) {
         )}
         <Code style={{minWidth: '40em'}}>{sample.app}</Code>
       </div>
-    </div>
+    </section>
   );
 }
 

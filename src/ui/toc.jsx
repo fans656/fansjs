@@ -42,13 +42,36 @@ export function Toc({
 
 function TocItem({item, selected}) {
   item = normalizedItem(item);
-  const href = item.href || `#${item.fragment || item.name || item.title}`;
   const highlighted = selected === item.key;
+  return (
+    <li>
+      <a
+        className="fansui-toc-link"
+        href={getItemHref(item)}
+        style={{
+          fontWeight: highlighted ? 'bold' : null,
+        }}
+      >
+        {item.label}
+      </a>
+      {item.children ? (
+        <ul>
+          {item.children.map((d, idx) => (
+            <TocItem
+              key={idx}
+              item={d}
+              selected={selected}
+            />
+          ))}
+        </ul>
+      ) : null}
+    </li>
+  );
   return (
     <li>
       <Routed.Link
         className="fansui-toc-link"
-        to={href}
+        to={getItemHref(item)}
         style={{
           fontWeight: highlighted ? 'bold' : null,
         }}
@@ -68,6 +91,16 @@ function TocItem({item, selected}) {
       ) : null}
     </li>
   );
+}
+
+function getItemHref(item) {
+  if (item.href) {
+    return item.href;
+  } else {
+    const url = new URL(window.location.href);
+    url.hash = `#${item.fragment || item.key || item.name || item.label || item.title}`;
+    return url.href;
+  }
 }
 
 function normalizedItem(item) {
