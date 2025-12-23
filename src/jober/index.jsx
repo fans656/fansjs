@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import _ from 'lodash';
 
 import { Button, List } from 'fansjs/ui';
 
@@ -15,22 +16,45 @@ export default function Jober({
 }
 
 function Dashboard() {
-  const [curJob, set_curJob] = useState(null);
-  const [curRun, set_curRun] = useState(null);
-
-  const {jobs} = useJobs();
-  const {runs} = useRuns(curJob);
+  const jobs = useCollection({
+    source: async (set_data) => {
+      const res = await api.get('/api/jobs');
+      set_data(res.data);
+    },
+  });
+  const runs = useCollection({
+    source: async (set_data) => {
+      if (jobs.current) {
+        const res = await api.get('/api/runs', {params: {job_id: jobs.current.id}});
+        set_data(res.data.reverse());
+      }
+    },
+  }, [jobs.current]);
+  
+  useEffect(() => {
+    const eventSource = new EventSource('/api/events');
+    eventSource.onmessage = (event) => {
+      event = JSON.parse(event.data);
+      switch (event.type) {
+        case 'run_status':
+          jobs.update(event.job_id, {'status': event.status});
+          break;
+      }
+      //console.log(event);
+    };
+    return () => eventSource.close();
+  }, []);
 
   return (
     <div className="horz margin stretch">
-      <JobsList jobs={jobs} set_curJob={set_curJob}/>
+      <JobsList jobs={jobs.data} set_curJob={jobs.set_current}/>
       <div className="flex-1" style={{marginLeft: '1em'}}>
-        {curJob ? (
+        {jobs.current ? (
           <JobDetail
-            job={curJob}
-            run={curRun}
-            runs={runs}
-            set_curRun={set_curRun}
+            job={jobs.current}
+            run={runs.current}
+            runs={runs.data}
+            set_curRun={runs.set_current}
           />
         ) : (
           <div>dashboard</div>
@@ -40,32 +64,32 @@ function Dashboard() {
   );
 }
 
-function JobsList({jobs, curJob, set_curJob}) {
+function JobsList({jobs, set_curJob}) {
   return (
     <List
       data={jobs}
-      render={job => <JobListItem job={job}/>}
+      render={job => job.name}
       domain="job"
       onSelected={set_curJob}
       style={{minWidth: '30em'}}
+      actions={(job) => {
+        return {
+          'Stop': {hover: true, onAction: () => console.log('stop', job)},
+          'Status': (
+            <div
+              className="small mono"
+              style={{
+                width: '7ch',
+                color: getJobStatusColor(job.status),
+              }}
+            >
+              {_.capitalize(job.status)}
+            </div>
+          ),
+        };
+      }}
     />
   );
-}
-
-function JobListItem({job}) {
-  return (
-    <div>
-      <div>{job.name}</div>
-      <div className="gray small mono">{job.id}</div>
-    </div>
-  );
-}
-
-function getJobListItemActions(job) {
-  return [
-    <a>Run</a>,
-    <a>Stop</a>,
-  ];
 }
 
 function JobDetail({job, run, runs, set_curRun}) {
@@ -141,20 +165,6 @@ function RunListItem({run}) {
   );
 }
 
-function useJobs() {
-  const [jobs, set_jobs] = useState([]);
-
-  useEffect(() => {
-    (async () => {
-      const res = await api.get('/api/jobs');
-      console.log(res);
-      set_jobs(res.data);
-    })();
-  }, []);
-  
-  return {jobs};
-}
-
 function useRuns(job) {
   const [runs, set_runs] = useState([]);
   useEffect(() => {
@@ -167,4 +177,65 @@ function useRuns(job) {
     }
   }, [job && job.id]);
   return {runs};
+}
+
+function getJobStatusColor(status) {
+  switch (status) {
+    case 'running':
+      return 'green';
+    case 'error':
+      return 'red';
+  }
+}
+
+function useCollection({
+  source = undefined,
+  key = 'id',
+}, deps = []) {
+  const [source_items, set_source_items] = useState([]);
+  
+  const refresh = useCallback(async () => {
+    if (source) {
+      await source(set_source_items);
+    }
+  }, [...deps]);
+  
+  // initial load
+  useEffect(() => {
+    refresh();
+  }, [...deps]);
+  
+  const mapping = useMemo(() => {
+    return Object.fromEntries(source_items.map((item, index) => [item[key], index]));
+  }, [source_items, ...deps]);
+  
+  const [items, set_items] = useState([]);
+  useEffect(() => {
+    set_items(source_items);
+  }, [source_items, ...deps]);
+  
+  const [currentKey, set_currentKey] = useState();
+  const current = useMemo(() => items[mapping[currentKey]], [items, mapping, currentKey, ...deps]);
+  const set_current = useCallback(item => set_currentKey(item ? item[key] : null), [mapping, ...deps]);
+  
+  const update = useCallback((key, fields) => {
+    const index = mapping[key];
+    if (index != null) {
+      set_items([
+        ...source_items.slice(0, index),
+        Object.assign({}, source_items[index], fields),
+        ...source_items.slice(index + 1, source_items.length),
+      ]);
+    }
+  }, [source_items, mapping, ...deps]);
+  
+  const ref = React.useRef({});
+
+  ref.current.data = items;
+  ref.current.current = current;
+  ref.current.set_current = set_current;
+  ref.current.refresh = refresh;
+  ref.current.update = update;
+  
+  return ref.current;
 }

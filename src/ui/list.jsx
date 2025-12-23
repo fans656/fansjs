@@ -33,6 +33,7 @@ export function List({
   
   const uiContext = useUIContext();
   const [curItem, set_curItem] = useCurItem({domain, uiContext, getKey, onSelected});
+  const [hoveringItem, set_hoveringItem] = useState(null);
 
   useSyncCurItemFromQuery({domain, data, curItem, set_curItem, getKey, uiContext});
 
@@ -41,6 +42,7 @@ export function List({
       dataSource={data}
       renderItem={item => {
         const selected = curItem && getKey(curItem) == getKey(item);
+        const hovering = hoveringItem && getKey(hoveringItem) == getKey(item);
         return (
           <AntdList.Item
             className={clsx('hover-background', selected && 'selected')}
@@ -48,8 +50,14 @@ export function List({
               background: selected ? selectedBackground : null,
               '--hover-background': hoverBackground,
             }}
-            actions={normalizedActions(actions, item)}
+            actions={normalizedActions(actions, item, {hovering})}
             onClick={() => set_curItem(selected ? null : item)}
+            onMouseEnter={() => {
+              set_hoveringItem(item);
+            }}
+            onMouseLeave={() => {
+              set_hoveringItem(null);
+            }}
           >
             {render(item)}
           </AntdList.Item>
@@ -84,18 +92,65 @@ function useSyncCurItemFromQuery({domain, data, curItem, set_curItem, getKey, ui
   }, [data, query[domain]]);
 }
 
-function normalizedActions(actions, item) {
+function normalizedActions(actions, item, {hovering}) {
+  if (actions == null) {
+    return undefined;
+  }
+  
+  if (React.isValidElement(actions)) {
+    return [actions];
+  }
+
   if (_.isFunction(actions)) {
-    return actions(item);
-  } else if (_.isObject(actions)) {
-    return Object.entries(actions).map(([actionName, onAction]) => {
+    actions = actions(item, {hovering});
+  }
+
+  if (_.isObject(actions)) {
+    actions = Object.entries(actions).map(([name, action]) => {
+      if (_.isFunction(action)) {
+        return {name, onAction: action};
+      } else if (React.isValidElement(action)) {
+        return {name, custom: true, comp: action};
+      } else if (_.isObject(action)) {
+        return {name, ...action};
+      } else {
+        console.warning('invalid List action', name, action);
+        return {name, onAction: _.noop};
+      }
+    });
+  }
+
+  if (!_.isArray(actions)) {
+    console.error('invalid List actions', actions);
+    actions = [];
+  }
+
+  actions = actions.map(action => {
+    if (React.isValidElement(action)) {
+      return {custom: true, comp: action};
+    } else {
+      return action;
+    }
+  });
+
+  return actions.map(action => {
+    if (action.hover && !hovering) {
+      return null;
+    }
+
+    if (action.custom) {
+      return action.comp;
+    } else {
       return (
-        <Button onClick={() => onAction(item)} size="small" type="link">
-          {actionName}
+        <Button
+          className={`list-action-${action.name}`}
+          onClick={() => action.onAction(item)}
+          size="small"
+          type="link"
+        >
+          {action.name}
         </Button>
       );
-    });
-  } else {
-    return actions;
-  }
+    }
+  });
 }

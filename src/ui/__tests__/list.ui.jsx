@@ -1,10 +1,11 @@
 import React from 'react';
-import { render, screen, cleanup, fireEvent } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { render, screen, within, cleanup, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
 
 import { Root, List } from 'fansjs/ui';
 
-describe('List', () => {
+describe('List basics', () => {
   afterEach(() => cleanup());
 
   it('render simple numbers', () => {
@@ -21,6 +22,17 @@ describe('List', () => {
     expect(items(d => d.textContent)).toEqual(['a','b','c']);
   })
 
+  it('custom render function', () => {
+    render(
+      <List render={d => d.toUpperCase()}>{['a','b','c']}</List>
+    )
+    expect(items(d => d.textContent)).toEqual(['A','B','C']);
+  })
+})
+
+describe('List query', () => {
+  afterEach(() => cleanup());
+
   it('sync selected item from query', () => {
     window.location.assign('/?cur=foo'); 
     render(
@@ -28,12 +40,81 @@ describe('List', () => {
     )
     expect(items(className('selected'))).toEqual([true, false]);
   })
+})
 
-  it('custom render function', () => {
+describe('List actions', () => {
+  afterEach(() => cleanup());
+
+  it('actions', async () => {
+    const onAction = vi.fn();
     render(
-      <List render={d => d.toUpperCase()}>{['a','b','c']}</List>
+      <List
+        actions={{
+          'Info': onAction,
+        }}
+      >
+        {[1,2,3]}
+      </List>
     )
-    expect(items(d => d.textContent)).toEqual(['A','B','C']);
+    const lis = items();
+
+    await userEvent.click(within(lis[0]).getByRole('button'));
+    expect(onAction).toHaveBeenCalledWith(1);
+  })
+
+  it('hover actions', async () => {
+    render(
+      <List
+        actions={{
+          'Info': {hover: true},
+        }}
+      >
+        {[1,2,3]}
+      </List>
+    )
+    const lis = items();
+
+    await userEvent.hover(lis[0]);
+    expect(screen.queryAllByRole('button')).to.have.lengthOf(1);
+    await userEvent.unhover(lis[0]);
+    expect(screen.queryAllByRole('button')).to.have.lengthOf(0);
+  })
+
+  it('custom component (array)', async () => {
+    render(
+      <List
+        actions={[
+          <div>custom</div>,
+        ]}
+      >
+        {[1,2,3]}
+      </List>
+    )
+    expect(screen.getAllByText('custom')).to.have.lengthOf(3);
+  })
+
+  it('custom component (object)', async () => {
+    render(
+      <List
+        actions={{
+          'Info': <div>custom</div>,
+        }}
+      >
+        {[1,2,3]}
+      </List>
+    )
+    expect(screen.getAllByText('custom')).to.have.lengthOf(3);
+  })
+
+  it('custom component (component)', async () => {
+    render(
+      <List
+        actions={<div>custom</div>}
+      >
+        {[1,2,3]}
+      </List>
+    )
+    expect(screen.getAllByText('custom')).to.have.lengthOf(3);
   })
 })
 
