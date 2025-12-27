@@ -1,11 +1,13 @@
 import React, { useEffect } from 'react';
 import qs from 'qs';
 
-import { Routed, Layout, Toc, Code } from 'fansjs/ui';
+import { Root, Routed, Layout, Toc, Code } from 'fansjs/ui';
+import Dev from 'fansjs/dev';
 
 import { docs, apps } from 'src/__generated__/docs';
 
 export default function App() {
+  return <Root><Dev/></Root>;
   const query = qs.parse(window.location.search.substring(1));
   if (query.__app__) {
     const app = apps[query.__app__];

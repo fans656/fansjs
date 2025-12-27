@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import _ from 'lodash';
 
-import { Button, List } from 'fansjs/ui';
+import { Button, List, Tabs, Code } from 'fansjs/ui';
 
 import { api } from './api';
 
-export default function Jober({
+export function Jober({
   origin = '',
 }) {
   api.useOrigin(origin);
@@ -94,24 +94,28 @@ function JobsList({jobs, set_curJob}) {
 
 function JobDetail({job, run, runs, set_curRun}) {
   return (
-    <div className="flex-1 vert margin" style={{minHeight: '100%'}}>
-      <div className="horz margin center">
-        <h3>{job.name}</h3>
-        <div className="horz xs-margin small">
-          <div>ID: {job.id}</div>
+    <Tabs>{[
+      {name: 'Output', render: () => (
+        <div className="horz margin flex-1">
+          <RunOutput job={job} run={run || runs[0]}/>
+          <RunsList
+            runs={runs}
+            set_curRun={set_curRun}
+          />
         </div>
-      </div>
-      <div className="small mono">
-        <pre><code>{JSON.stringify(job, null, 2)}</code></pre>
-      </div>
-      <div className="horz margin flex-1">
-        <RunOutput job={job} run={run || runs[0]}/>
-        <RunsList
-          runs={runs}
-          set_curRun={set_curRun}
-        />
-      </div>
-    </div>
+      )},
+      {name: 'Detail', render: () => (
+        <div>
+          <div className="horz margin center">
+            <h3>{job.name}</h3>
+            <div className="horz xs-margin small">
+              <div>ID: {job.id}</div>
+            </div>
+          </div>
+          <Code className="xs-small">{JSON.stringify(job, null, 2)}</Code>
+        </div>
+      )},
+    ]}</Tabs>
   );
 }
 

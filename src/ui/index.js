@@ -10,6 +10,7 @@ export { Code } from './code';
 export { Table } from './table';
 export { Edit } from './edit';
 export { List } from './list';
+export { Tabs } from './tabs';
 export { Actions, Action } from './action';
 export { message } from './message';
 export { dialog } from './dialog';
@@ -87,5 +88,17 @@ styleInject(`
 
 .hover-background:hover {
   background: var(--hover-background);
+}
+
+.small {
+  font-size: .8rem;
+}
+
+.xs-small {
+  font-size: .7rem;
+}
+
+.center {
+  align-items: center;
 }
 `);

@@ -30,6 +30,9 @@ export default defineConfig(({mode}) => {
     ],
     server: {
       port: ports.fansjs_dev,
+      proxy: {
+        '/api': {target: `http://127.0.0.1:8000`},
+      },
     },
     test: {
       environmentMatch: {

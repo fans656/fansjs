@@ -1,8 +1,12 @@
 import styleInject from 'style-inject';
+import clsx from 'clsx';
 
-export function Code({children, style}) {
+export function Code({children, className, style}) {
   return (
-    <pre className="fansui-code" style={style}>
+    <pre
+      className={clsx('fansui-code', className)}
+      style={style}
+    >
       <code>
         {children}
       </code>
